@@ -1,4 +1,5 @@
 <script setup>
+
 const desserts = [
   {
     dessert: 'Frozen Yogurt',
@@ -46,19 +47,25 @@ const desserts = [
     <thead>
       <tr>
         <th class="text-uppercase">
-          Desserts (100g Servings)
+          Date
         </th>
         <th>
-          calories
+          Valeur
         </th>
         <th>
-          Fat(g)
+          Quantité
         </th>
         <th>
-          Carbs(g)
+          Cours
         </th>
         <th>
-          protein(g)
+          Brut
+        </th>
+        <th>
+          Commissions
+        </th>
+        <th>
+          Net
         </th>
       </tr>
     </thead>
@@ -87,3 +94,4 @@ const desserts = [
     </tbody>
   </VTable>
 </template>
+

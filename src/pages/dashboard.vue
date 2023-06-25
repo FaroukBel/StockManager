@@ -17,49 +17,24 @@ import wallet from '@images/cards/wallet-info.png'
   <VRow>
     <!-- 👉 Congratulations -->
     <VCol
-      cols="12"
-      md="8"
+    cols="12"
+      md="12"
+  
     >
       <AnalyticsCongratulations />
     </VCol>
 
-    <VCol
+  
+ 
+ <!-- 👉 Transactions -->
+ <VCol
       cols="12"
+      md="4"
       sm="4"
+      order="2"
     >
-      <VRow>
-        <!-- 👉 Profit -->
-        <VCol
-          cols="12"
-          md="6"
-        >
-          <CardStatisticsVertical
-            v-bind="{
-              title: 'Profit',
-              image: chart,
-              stats: '$12,628',
-              change: 72.80,
-            }"
-          />
-        </VCol>
-
-        <!-- 👉 Sales -->
-        <VCol
-          cols="12"
-          md="6"
-        >
-          <CardStatisticsVertical
-            v-bind="{
-              title: 'Sales',
-              image: wallet,
-              stats: '$4,679',
-              change: 28.42,
-            }"
-          />
-        </VCol>
-      </VRow>
+      <AnalyticsTransactions />
     </VCol>
-
     <!-- 👉 Total Revenue -->
     <VCol
       cols="12"
@@ -69,6 +44,8 @@ import wallet from '@images/cards/wallet-info.png'
     >
       <AnalyticsTotalRevenue />
     </VCol>
+
+   
 
     <VCol
       cols="12"
@@ -140,14 +117,6 @@ import wallet from '@images/cards/wallet-info.png'
       <AnalyticsFinanceTabs />
     </VCol>
 
-    <!-- 👉 Transactions -->
-    <VCol
-      cols="12"
-      md="4"
-      sm="6"
-      order="3"
-    >
-      <AnalyticsTransactions />
-    </VCol>
+    
   </VRow>
 </template>

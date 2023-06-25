@@ -12,7 +12,7 @@ const illustrationJohn = computed(() => global.name.value === 'dark' ? illustrat
     <VRow no-gutters>
       <VCol
         cols="12"
-        sm="8"
+        sm="12"
         order="2"
         order-sm="1"
       >

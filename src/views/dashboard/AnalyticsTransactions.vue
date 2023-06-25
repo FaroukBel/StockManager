@@ -4,7 +4,6 @@ import creditCardSuccess from '@images/cards/credit-card-success.png'
 import creditCardWarning from '@images/cards/credit-card-warning.png'
 import paypalError from '@images/cards/paypal-error.png'
 import walletPrimary from '@images/cards/wallet-primary.png'
-
 const transactions = [
   {
     amount: +82.6,
@@ -67,50 +66,51 @@ const moreList = [
 </script>
 
 <template>
-  <VCard title="Transactions">
+  <v-card title="Transactions">
     <template #append>
       <div class="me-n3 mt-n2">
         <MoreBtn :menu-list="moreList" />
       </div>
     </template>
 
-    <VCardText>
-      <VList class="card-list">
-        <VListItem
+    <v-card-text style="overflow-y: auto; max-height: 320px;">
+      <v-list class="card-list">
+        <v-list-item
           v-for="item in transactions"
           :key="item.paymentMethod"
         >
           <template #prepend>
-            <VAvatar
+            <v-avatar
               rounded
               variant="tonal"
               :color="item.color"
-              :image="item.icon"
+              :src="item.icon"
               class="me-3"
             />
           </template>
 
-          <VListItemSubtitle class="text-disabled mb-1">
+          <v-list-item-subtitle class="text-disabled mb-1">
             {{ item.paymentMethod }}
-          </VListItemSubtitle>
-          <VListItemTitle>
+          </v-list-item-subtitle>
+          <v-list-item-title>
             {{ item.description }}
-          </VListItemTitle>
+          </v-list-item-title>
 
           <template #append>
-            <VListItemAction>
+            <v-list-item-action>
               <span class="me-1">{{ item.amount > 0 ? `+$${Math.abs(item.amount)}` : `-$${Math.abs(item.amount)}` }}</span>
               <span class="text-disabled">USD</span>
-            </VListItemAction>
+            </v-list-item-action>
           </template>
-        </VListItem>
-      </VList>
-    </VCardText>
-  </VCard>
+        </v-list-item>
+      </v-list>
+    </v-card-text>
+  </v-card>
 </template>
 
 <style lang="scss" scoped>
-  .card-list {
-    --v-card-list-gap: 1.6rem;
-  }
+.card-list {
+  --v-card-list-gap: 1.6rem;
+}
+
 </style>
