@@ -48,26 +48,18 @@ const isPasswordVisible = ref(false)
             <!-- Username -->
             <VCol cols="12">
               <VTextField
-                v-model="form.username"
+                v-model="username"
                 autofocus
                 label="Username"
                 placeholder="Johndoe"
               />
             </VCol>
-            <!-- email -->
-            <VCol cols="12">
-              <VTextField
-                v-model="form.email"
-                label="Email"
-                placeholder="johndoe@email.com"
-                type="email"
-              />
-            </VCol>
+        
 
             <!-- password -->
             <VCol cols="12">
               <VTextField
-                v-model="form.password"
+                v-model="password"
                 label="Password"
                 placeholder="············"
                 :type="isPasswordVisible ? 'text' : 'password'"
@@ -95,6 +87,7 @@ const isPasswordVisible = ref(false)
               <VBtn
                 block
                 type="submit"
+                @click="register"
               >
                 Sign up
               </VBtn>
@@ -140,3 +133,41 @@ const isPasswordVisible = ref(false)
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth.scss";
 </style>
+
+
+<script>
+import AuthenticationService from '@/services/AuthenticationService'
+
+export default {
+  data () {
+    return {
+      username: '',
+      password: '',
+      error: null
+    }
+  },
+  watch: {
+    username (value) {
+      console.log(value)
+    }
+  },
+  methods: {
+    async register () {
+      try {
+        const response = await AuthenticationService.register({
+          username: this.username,
+          password: this.password
+        })
+        console.log(response.data);
+        // this.$store.dispatch('setToken', response.data.token)
+        // this.$store.dispatch('setUser', response.data.user)
+        // this.$router.push({
+        //   name: 'songs'
+        // })1
+      } catch (error) {
+        this.error = error.response.data.error
+      }
+    }
+  }
+}
+</script>
