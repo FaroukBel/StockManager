@@ -2,7 +2,7 @@
 import { useTheme } from 'vuetify'
 import illustrationJohnDark from '@images/cards/illustration-john-dark.png'
 import illustrationJohnLight from '@images/cards/illustration-john-light.png'
-import DemoSimpleTableFixedHeader from '@/views/pages/tables/DemoSimpleTableFixedHeader.vue'
+import HistoryTable from '@/views/pages/tables/HistoryTable.vue'
 const { global } = useTheme()
 const illustrationJohn = computed(() => global.name.value === 'dark' ? illustrationJohnDark : illustrationJohnLight)
 </script>
@@ -19,7 +19,7 @@ const illustrationJohn = computed(() => global.name.value === 'dark' ? illustrat
    
       <VCard title="Fixed Header">
       
-        <DemoSimpleTableFixedHeader />
+        <HistoryTable />
       </VCard>
 
         
