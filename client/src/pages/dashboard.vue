@@ -5,6 +5,7 @@ import AnalyticsOrderStatistics from '@/views/dashboard/AnalyticsOrderStatistics
 import AnalyticsProfitReport from '@/views/dashboard/AnalyticsProfitReport.vue'
 import AnalyticsTotalRevenue from '@/views/dashboard/AnalyticsTotalRevenue.vue'
 import AnalyticsTransactions from '@/views/dashboard/AnalyticsTransactions.vue'
+import AddTransaction from '@/views/dashboard/AddTransaction.vue'
 
 // 👉 Images
 import chart from '@images/cards/chart-success.png'
@@ -24,7 +25,13 @@ import wallet from '@images/cards/wallet-info.png'
       <AnalyticsCongratulations />
     </VCol>
 
+    <VCol
+    cols="12"
+      md="12"
   
+    >
+      <AddTransaction />
+    </VCol>
  
  <!-- 👉 Transactions -->
  <VCol

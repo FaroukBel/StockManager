@@ -1,9 +1,9 @@
 module.exports = (sequalize, DataTypes) => 
     sequalize.define('Stock', {
-        Date: {
-            type:DataTypes.DATE
+        value: {
+            type:DataTypes.STRING
+        }, designation: {
+            type:DataTypes.STRING
         }
-        
     }
-        
-    );
+);

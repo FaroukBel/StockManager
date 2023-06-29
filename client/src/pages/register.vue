@@ -35,9 +35,9 @@ const isPasswordVisible = ref(false)
 
       <VCardText class="pt-2">
         <h5 class="text-h5 mb-1">
-          Connectez-vous
+          Créer un compte
         </h5>
-      
+  
       </VCardText>
 
       <VCardText>
@@ -65,26 +65,12 @@ const isPasswordVisible = ref(false)
                 @click:append-inner="isPasswordVisible = !isPasswordVisible"
               />
               <div class="d-flex align-center mt-1 mb-4">
-                <VCheckbox
-                  id="privacy-policy"
-                  v-model="form.privacyPolicies"
-                  inline
-                />
-                <VLabel
-                  for="privacy-policy"
-                  style="opacity: 1;"
-                >
-                  <span class="me-1">I agree to</span>
-                  <a
-                    href="javascript:void(0)"
-                    class="text-primary"
-                  >privacy policy & terms</a>
-                </VLabel>
+                
               </div>
 
               <VBtn
                 block
-              
+           
                 @click="register"
               >
                 Sign up
@@ -96,12 +82,12 @@ const isPasswordVisible = ref(false)
               cols="12"
               class="text-center text-base"
             >
-              <span>Already have an account?</span>
+              <span>Déjà un compte ?</span>
               <RouterLink
                 class="text-primary ms-2"
                 to="/login"
               >
-                Sign in instead
+                Connectez-vous
               </RouterLink>
             </VCol>
 
@@ -144,11 +130,6 @@ export default {
       error: null
     }
   },
-  watch: {
-    username (value) {
-      console.log(value)
-    }
-  },
   methods: {
     async register () {
       try {
@@ -156,12 +137,7 @@ export default {
           username: this.username,
           password: this.password
         })
-        console.log(response.data);
-        // this.$store.dispatch('setToken', response.data.token)
-        // this.$store.dispatch('setUser', response.data.user)
-        // this.$router.push({
-        //   name: 'songs'
-        // })1
+     
       } catch (error) {
         this.error = error.response.data.error
       }

@@ -71,27 +71,43 @@ const desserts = [
     </thead>
 
     <tbody>
-      <tr
-        v-for="item in desserts"
-        :key="item.dessert"
-      >
-        <td>
-          {{ item.dessert }}
-        </td>
-        <td class="text-center">
-          {{ item.calories }}
-        </td>
-        <td class="text-center">
-          {{ item.fat }}
-        </td>
-        <td class="text-center">
-          {{ item.carbs }}
-        </td>
-        <td class="text-center">
-          {{ item.protein }}
-        </td>
-      </tr>
+      <tr v-for="transaction in transactions" :key="transaction.id">
+          <td>{{ transaction.date }}</td>
+          <td>{{ transaction.value }}</td>
+          <td>{{ transaction.designation }}</td>
+          <td>{{ transaction.quantity }}</td>
+          <td>{{ transaction.price }}</td>
+          <td>{{ transaction.brut }}</td>
+          <td>{{ transaction.tax }}</td>
+          <td>{{ transaction.net }}</td>
+        </tr>
     </tbody>
   </VTable>
 </template>
 
+
+<script>
+import TransactionsService from '@/services/TransactionsService';
+
+export default {
+  data() {
+    return {
+      transactions: [],
+    };
+  },
+  created() {
+    this.fetchTransactions();
+  },
+  methods: {
+    fetchTransactions() {
+      TransactionsService.index()
+        .then((response) => {
+          this.transactions = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
+};
+</script>

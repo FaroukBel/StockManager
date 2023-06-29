@@ -28,16 +28,16 @@ const isPasswordVisible = ref(false)
         </template>
 
         <VCardTitle class="text-2xl font-weight-bold">
-          sneat
+        Boursier
         </VCardTitle>
       </VCardItem>
 
       <VCardText class="pt-2">
         <h5 class="text-h5 mb-1">
-          Welcome to sneat! 👋🏻
+          Bonjour à Boursier,
         </h5>
         <p class="mb-0">
-          Please sign-in to your account and start the adventure
+          Connectez-vous
         </p>
       </VCardText>
 
@@ -47,18 +47,18 @@ const isPasswordVisible = ref(false)
             <!-- email -->
             <VCol cols="12">
               <VTextField
-                v-model="form.email"
+                v-model="username"
                 autofocus
-                placeholder="johndoe@email.com"
-                label="Email"
-                type="email"
+                placeholder="23087263"
+                label="Login"
+                type="username"
               />
             </VCol>
 
             <!-- password -->
             <VCol cols="12">
               <VTextField
-                v-model="form.password"
+                v-model="password"
                 label="Password"
                 placeholder="············"
                 :type="isPasswordVisible ? 'text' : 'password'"
@@ -69,7 +69,7 @@ const isPasswordVisible = ref(false)
               <!-- remember me checkbox -->
               <div class="d-flex align-center justify-space-between flex-wrap mt-1 mb-4">
                 <VCheckbox
-                  v-model="form.remember"
+                  v-model="remember"
                   label="Remember me"
                 />
 
@@ -84,7 +84,7 @@ const isPasswordVisible = ref(false)
               <!-- login button -->
               <VBtn
                 block
-                type="submit"
+                @click="login"
               >
                 Login
               </VBtn>
@@ -126,6 +126,39 @@ const isPasswordVisible = ref(false)
     </VCard>
   </div>
 </template>
+
+
+<script>
+import AuthenticationService from '@/services/AuthenticationService'
+
+export default {
+  data () {
+    return {
+      username: '',
+      password: '',
+      error: null
+    }
+  },
+  methods: {
+    async login () {
+      try {
+        const response = await AuthenticationService.login({
+          username: this.username,
+          password: this.password
+        })
+        this.$store.dispatch('setToken', response.data.token)
+        this.$store.dispatch('setUser', response.data.user)
+        this.$router.push({
+          name: 'songs'
+        })
+      } catch (error) {
+        this.error = error.response.data.error
+      }
+    }
+  }
+}
+</script>
+
 
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth.scss";
