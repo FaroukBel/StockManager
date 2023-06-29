@@ -5,7 +5,7 @@ import AnalyticsOrderStatistics from '@/views/dashboard/AnalyticsOrderStatistics
 import AnalyticsProfitReport from '@/views/dashboard/AnalyticsProfitReport.vue'
 import AnalyticsTotalRevenue from '@/views/dashboard/AnalyticsTotalRevenue.vue'
 import AnalyticsTransactions from '@/views/dashboard/AnalyticsTransactions.vue'
-import AddTransaction from '@/views/dashboard/AddTransaction.vue'
+import TransactionForm from '@/views/pages/form-layouts/TransactionForm.vue'
 
 // 👉 Images
 import chart from '@images/cards/chart-success.png'
@@ -16,6 +16,32 @@ import wallet from '@images/cards/wallet-info.png'
 
 <template>
   <VRow>
+    <VCol
+    cols="8"
+      md="8"
+  
+    >
+    <VCard title="Ajouter une transaction"
+    cols="8"
+      md="8">
+          <VCardText 
+          >
+   
+      <TransactionForm />
+
+  </VCardText>
+</VCard>
+</VCol>
+
+     <!-- 👉 Transactions -->
+ <VCol
+      cols="12"
+      md="4"
+
+    >
+      <AnalyticsTransactions />
+    </VCol>
+
     <!-- 👉 Congratulations -->
     <VCol
     cols="12"
@@ -25,23 +51,9 @@ import wallet from '@images/cards/wallet-info.png'
       <AnalyticsCongratulations />
     </VCol>
 
-    <VCol
-    cols="12"
-      md="12"
-  
-    >
-      <AddTransaction />
-    </VCol>
+    
  
- <!-- 👉 Transactions -->
- <VCol
-      cols="12"
-      md="4"
-      sm="4"
-      order="2"
-    >
-      <AnalyticsTransactions />
-    </VCol>
+
     <!-- 👉 Total Revenue -->
     <VCol
       cols="12"

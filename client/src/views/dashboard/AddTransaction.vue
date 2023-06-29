@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import TransactionsService from '@/services/TransactionsService';
+import HistoryTransactionsService from '@/services/HistoryTransactionsService';
 
 export default {
   data() {
@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     submitForm() {
-      TransactionsService.post(this.transaction)
+      HistoryTransactionsService.post(this.transaction)
         .then(() => {
           // Reset form fields after successful submission
           this.transaction = {
@@ -71,6 +71,7 @@ export default {
           alert('Failed to save transaction.');
         });
     },
+    
   },
 };
 </script>

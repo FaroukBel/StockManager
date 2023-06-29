@@ -1,18 +1,20 @@
 module.exports = (sequalize, DataTypes) => 
-    sequalize.define('Transaction', {
-        stock: {
+    sequalize.define('HistoryTransaction', {
+        date: {
+            type:DataTypes.DATE
+        }, value: {
+            type:DataTypes.STRING
+        }, designation: {
             type:DataTypes.STRING
         }, quantity: {
             type:DataTypes.STRING
-        }, buyprice: {
+        }, price: {
             type:DataTypes.STRING
-        }, sellprice: {
+        }, brut: {
             type:DataTypes.STRING
-        }, total: {
+        }, tax: {
             type:DataTypes.STRING
-        }, pl: {
-            type:DataTypes.STRING
-        }, totalgain: {
+        }, net: {
             type:DataTypes.STRING
         }
     }

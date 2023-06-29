@@ -73,7 +73,7 @@ const moreList = [
       </div>
     </template>
 
-    <v-card-text style="overflow-y: auto; max-height: 320px;">
+    <v-card-text style="max-height: 380px; overflow-y: auto;">
       <v-list class="card-list">
         <v-list-item
           v-for="item in transactions"
