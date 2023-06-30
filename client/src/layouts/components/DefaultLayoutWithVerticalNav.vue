@@ -37,14 +37,12 @@ const upgradeBanner = computed(() => {
           style="user-select: none;"
         >
           <!-- 👉 Search Trigger button -->
-          <IconBtn>
-            <VIcon icon="bx-search" />
-          </IconBtn>
+     
 
           <span class="d-none d-md-flex align-center text-disabled">
-            <span class="me-3">Search</span>
-            <span class="meta-key">&#8984;K</span>
-          </span>
+  <span class="me-3 larger-span">Solde</span>
+  <span class="me-3 larger-span">200322.53 DH</span>
+</span>
         </div>
 
         <VSpacer />
@@ -169,4 +167,11 @@ const upgradeBanner = computed(() => {
   padding-block: 0.125rem;
   padding-inline: 0.25rem;
 }
+
+</style>
+<style>
+  .larger-span {
+    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+    font-size: 22px;
+  }
 </style>

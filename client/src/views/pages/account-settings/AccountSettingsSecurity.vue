@@ -352,7 +352,7 @@ const recentDevices = [
               </span>
             </div>
           </template>
-          <!-- TODO Refactor this after vuetify provides proper solution for removing default footer -->
+      
           <template #bottom />
         </VDataTable>
       </VCard>

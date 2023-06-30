@@ -4,7 +4,7 @@ module.exports = (sequalize, DataTypes) =>
             type:DataTypes.DATE
         }, value: {
             type:DataTypes.STRING
-        }, designation: {
+        }, type: {
             type:DataTypes.STRING
         }, quantity: {
             type:DataTypes.STRING

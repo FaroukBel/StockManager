@@ -6,9 +6,9 @@ import { hexToRgb } from '@layouts/utils'
 const vuetifyTheme = useTheme()
 
 const series = [
-  45,
-  80,
   20,
+  60,
+  1,
   40,
 ]
 

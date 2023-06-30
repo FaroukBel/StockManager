@@ -1,4 +1,4 @@
-const {Transaction} = require('../models')
+const {Transaction, HistoryTransaction} = require('../models');
 
 const getTransactions = async (req, res) => {
     try {
@@ -24,7 +24,37 @@ const getTransactions = async (req, res) => {
         pl,
         totalgain
       });
-  
+    
+      var type = "buy";
+      var price = buyprice;
+      const value = stock;
+      const date = "";
+      const brut = "";
+      const tax = "";
+      const net = "";
+      const buyhistorytransaction = await HistoryTransaction.create({
+        date,
+        value,
+        type,
+        quantity,
+        price,
+        brut,
+        tax,
+        net,
+      });
+      var type = "sell";
+      var price = sellprice;
+
+      const sellhistorytransaction = await HistoryTransaction.create({
+        date,
+        value,
+        type,
+        quantity,
+        price,
+        brut,
+        tax,
+        net,
+      });
       res.json(transaction);
     } catch (error) {
       console.error(error);

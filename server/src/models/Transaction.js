@@ -3,17 +3,17 @@ module.exports = (sequalize, DataTypes) =>
         stock: {
             type:DataTypes.STRING
         }, quantity: {
-            type:DataTypes.STRING
+            type:DataTypes.NUMBER
         }, buyprice: {
-            type:DataTypes.STRING
+            type:DataTypes.NUMBER
         }, sellprice: {
-            type:DataTypes.STRING
+            type:DataTypes.NUMBER
         }, total: {
-            type:DataTypes.STRING
+            type:DataTypes.NUMBER
         }, pl: {
-            type:DataTypes.STRING
+            type:DataTypes.NUMBER
         }, totalgain: {
-            type:DataTypes.STRING
+            type:DataTypes.NUMBER
         }
     }
 );

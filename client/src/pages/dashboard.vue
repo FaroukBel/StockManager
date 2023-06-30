@@ -6,7 +6,8 @@ import AnalyticsProfitReport from '@/views/dashboard/AnalyticsProfitReport.vue'
 import AnalyticsTotalRevenue from '@/views/dashboard/AnalyticsTotalRevenue.vue'
 import AnalyticsTransactions from '@/views/dashboard/AnalyticsTransactions.vue'
 import TransactionForm from '@/views/pages/form-layouts/TransactionForm.vue'
-
+import BuyForm from '@/views/pages/form-layouts/BuyForm.vue'
+import SellForm from '@/views/pages/form-layouts/SellForm.vue'
 // 👉 Images
 import chart from '@images/cards/chart-success.png'
 import card from '@images/cards/credit-card-primary.png'
@@ -41,7 +42,29 @@ import wallet from '@images/cards/wallet-info.png'
     >
       <AnalyticsTransactions />
     </VCol>
+    <VCol cols="12" md="6" class="d-flex flex-row">
+    <VCard
+    title="Achat"
+    >
+    <VCardText>
+      <BuyForm />
 
+    </VCardText>
+
+    </VCard>
+</VCol>
+
+  <VCol cols="12" md="6" class="d-flex flex-row">
+   
+    <VCard 
+    title="Vente">
+    <VCardText>
+
+      <SellForm />
+    </VCardText>
+
+    </VCard>
+</VCol>
     <!-- 👉 Congratulations -->
     <VCol
     cols="12"

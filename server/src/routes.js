@@ -1,5 +1,5 @@
 const AuthenticationController = require('./controllers/AuthentificationController') 
-const HistoryTransctionController = require('./controllers/HistoryTransactionContoller') 
+const HistoryTransctionController = require('./controllers/HistoryTransctionController') 
 const TransactionController = require('./controllers/TransactionController') 
 
 module.exports = (app) => {

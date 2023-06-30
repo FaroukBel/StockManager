@@ -3,7 +3,7 @@
   <VForm ref="myForm" @submit.prevent>
     <VRow>
       <!-- 👉 Valeur dropdown -->
-      <VCol cols="12" md="6">
+      <VCol cols="12" md="12">
           <VSelect
             v-model="transaction.stock"
             :items="valeurOptions"
@@ -44,19 +44,17 @@
           required
         />
       </VCol>
-
-      <!-- 👉 Sell Price -->
-      <VCol
+<!-- 👉 Commision -->
+<VCol
         cols="12"
         md="6"
       >
-      
         <VTextField
-          v-model="transaction.sellprice"
-          label="Prix de vente"
-          placeholder="23.53"
+          v-model="transaction.entryBuyPrice"
+          label="Commision"
+          placeholder="3452.45"
+          readonly
           type="number"
-          min="0"
         />
       </VCol>
 
@@ -73,30 +71,15 @@
           type="number"
         />
       </VCol>
-
-      <!-- 👉 +/- Value -->
-      <VCol
+  <!-- 👉 Total -->
+  <VCol
         cols="12"
-        md="6"
+        md="12"
       >
         <VTextField
-
-          v-model="transaction.pl"
-          label="+/- Value"
-          placeholder="3200.42"
-          readonly
-          type="number"
-          
-        />
-      </VCol>
-      <!-- 👉 TotalGain -->
-      <VCol
-        cols="12">
-        <VTextField
-
-          v-model="transaction.totalgain"
-          label="Total + Gain"
-          placeholder="3200.42"
+          v-model="transaction.totalcom"
+          label="Total + Commission"
+          placeholder="3452.45"
           readonly
           type="number"
         />
@@ -117,8 +100,10 @@
           Effacer
         </VBtn>
         <VBtn 
-        @click="submitForm">
-          Ajouter
+        @click="submitForm"
+        color="success">
+          Acheter
+          
         </VBtn>
       </VCol>
     </VRow>
@@ -137,10 +122,9 @@ export default {
         stock: '',
         quantity: '',
         buyprice: '',
-        sellprice: '',
         total: '',
-        pl: '',
-        totalgain: ''
+        totalcom: '',
+        entryBuyPrice: ''
       },
       valeurOptions: ["Attijariwafa Bank (ATW)",
   "Banque Centrale Populaire (BCP)",
@@ -174,27 +158,17 @@ export default {
     'transaction.buyprice': {
       handler(newValue) {
         this.calculateTotal();
-      },
-      immediate: true
-    },
-    'transaction.sellprice': {
-      handler(newValue) {
-        this.calculatePL();
+        
       },
       immediate: true
     },
     'transaction.total': {
       handler(newValue) {
-        this.calculateTotalGain();
-      },
-      immediate: true
-    },
-    'transaction.pl': {
-      handler(newValue) {
-        this.calculateTotalGain();
+        this.calculatePL();
       },
       immediate: true
     }
+ 
   },
   methods: {
     calculateTotal() {
@@ -207,37 +181,17 @@ export default {
       }
     },
     calculatePL() {
-      const quantity = parseFloat(this.transaction.quantity);
-      const buyPrice = parseFloat(this.transaction.buyprice);
-      const sellPrice = parseFloat(this.transaction.sellprice);
-      if (!isNaN(quantity) && !isNaN(buyPrice) && !isNaN(sellPrice)) {
-        const buyEntryTax = quantity * buyPrice * 0.007665;
-        const sellExitTax = quantity * sellPrice * 0.007665;
-        const entryBuyPrice = (quantity * buyPrice) + buyEntryTax;
-        const exitSellPrice = (quantity * sellPrice) - sellExitTax;
-        const tva = (exitSellPrice - entryBuyPrice) * 0.15;
-        if(exitSellPrice < entryBuyPrice){
-          this.transaction.pl = (exitSellPrice - entryBuyPrice).toFixed(2);
+  const quantity = parseFloat(this.transaction.quantity);
+  const buyPrice = parseFloat(this.transaction.buyprice);
+  if (!isNaN(quantity) && !isNaN(buyPrice)) {
+    const buyEntryTax = quantity * buyPrice * 0.007665;
+    this.transaction.entryBuyPrice = buyEntryTax.toFixed(2);
+    this.transaction.totalcom = this.transaction.total + this.transaction.entryBuyPrice;
+  } else {
+    this.transaction.entryBuyPrice = '';
+  }
 
-        }
-        else if(exitSellPrice > entryBuyPrice){
-          this.transaction.pl = ((exitSellPrice - entryBuyPrice) - tva).toFixed(2);
-
-        }
-      } else {
-        this.transaction.pl = '';
-      }
     },
-    calculateTotalGain() {
-      const total = parseFloat(this.transaction.total);
-      const pl = parseFloat(this.transaction.pl);
-      if (!isNaN(total) && !isNaN(pl)) {
-        this.transaction.totalgain = (total + pl).toFixed(2);
-      } else {
-        this.transaction.totalgain = '';
-      }
-    },
-
     async submitForm() {
       TransactionService.post(this.transaction)
         .then(() => {

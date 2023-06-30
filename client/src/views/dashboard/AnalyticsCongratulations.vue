@@ -17,7 +17,7 @@ const illustrationJohn = computed(() => global.name.value === 'dark' ? illustrat
         order-sm="1"
       >
    
-      <VCard title="Fixed Header">
+      <VCard title="Historique">
       
         <HistoryTable />
       </VCard>

@@ -1,47 +1,52 @@
-<template>
-  <VTable
-    height="250"
-    fixed-header
-  >
-    <thead>
-      <tr>
-        <th class="text-uppercase">
-          Date
-        </th>
-        <th>
-          Valeur
-        </th>
-        <th>
-          Quantité
-        </th>
-        <th>
-          Cours
-        </th>
-        <th>
-          Brut
-        </th>
-        <th>
-          Commissions
-        </th>
-        <th>
-          Net
-        </th>
-      </tr>
-    </thead>
+<script setup>
+import { VDataTable } from 'vuetify/labs/VDataTable'
+const HistoryTableHeaders = [
+  {
+    title: 'Date',
+    key: 'date',
+  },
+  {
+    title: 'Valeur',
+    key: 'value',
+  },
+  {
+    title: 'Type',
+    key: 'type',
+  },
+  {
+    title: 'Quantité',
+    key: 'quantity',
+  },
+  {
+    title: 'Cours',
+    key: 'price',
+  },
+  {
+    title: 'Brut',
+    key: 'brut',
+  },
+  {
+    title: 'Commision',
+    key: 'tax',
+  },
+  {
+    title: 'Net',
+    key: 'net',
+  },
+]
+</script>
 
-    <tbody>
-      <tr v-for="transaction in transactions" :key="transaction.id">
-          <td>{{ transaction.date }}</td>
-          <td>{{ transaction.value }}</td>
-          <td>{{ transaction.designation }}</td>
-          <td>{{ transaction.quantity }}</td>
-          <td>{{ transaction.price }}</td>
-          <td>{{ transaction.brut }}</td>
-          <td>{{ transaction.tax }}</td>
-          <td>{{ transaction.net }}</td>
-        </tr>
-    </tbody>
-  </VTable>
+<template>
+  <VDataTable
+    height="500"
+    fixed-header
+    :headers="HistoryTableHeaders"
+    :items="transactions"
+    class="text-no-wrap rounded-0 text-sm"
+  >
+    
+    
+  </VDataTable>
 </template>
 
 
