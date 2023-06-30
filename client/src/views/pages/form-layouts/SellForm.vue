@@ -50,7 +50,7 @@
         md="6"
       >
         <VTextField
-          v-model="transaction.exitSellPrice"
+          v-model="transaction.tax"
           label="Commision"
           placeholder="3452.45"
           readonly
@@ -114,19 +114,21 @@
 </template>
 
 <script>
-import TransactionService from '@/services/TransactionService';
+import HistoryTransactionsService from '@/services/HistoryTransactionsService';
 import { router } from '@/router';
 
 export default {
   data() {
     return {
       transaction: {
+        date: new Date().toISOString().substr(0, 10),
         stock: '',
+        type: 'Vente',
         quantity: '',
         sellprice: '',
         total: '',
-        totalcom: '',
-        exitSellPrice: ''
+        tax: '',
+        totalcom: ''
       },
       valeurOptions: ["Attijariwafa Bank (ATW)",
   "Banque Centrale Populaire (BCP)",
@@ -187,8 +189,8 @@ export default {
   const sellprice = parseFloat(this.transaction.sellprice);
   if (!isNaN(quantity) && !isNaN(sellprice)) {
     const sellExitTax = quantity * sellprice * 0.007665;
-    this.transaction.exitSellPrice = sellExitTax.toFixed(2);
-    this.transaction.totalcom = this.transaction.total - this.transaction.exitSellPrice;
+    this.transaction.tax = sellExitTax.toFixed(2);
+    this.transaction.totalcom = this.transaction.total - this.transaction.tax;
     
   } else {
     this.transaction.exitSellPrice = '';
@@ -198,20 +200,30 @@ export default {
   
 
     async submitForm() {
-      TransactionService.post(this.transaction)
+
+      if (
+    !this.transaction.stock ||
+    !this.transaction.quantity ||
+    !this.transaction.sellprice ||
+    !this.transaction.total ||
+    !this.transaction.totalcom
+  ) {
+    alert('Veuillez remplir les champs obligatoires.');
+    return;
+  }
+
+  HistoryTransactionsService.postSell(this.transaction)
         .then(() => {
           // Reset form fields after successful submission
           this.transaction = {
             stock: '',
             quantity: '',
-            buyprice: '',
             sellprice: '',
             total: '',
-            pl: '',
-            totalgain: ''
+            totalcom: ''
           };
-          router.push('/dashboard');
-          alert('Transaction saved successfully!');
+          location.reload();
+          alert('Transaction enregistrée avec succés!');
         })
         .catch((error) => {
           console.error(error);
@@ -222,11 +234,10 @@ export default {
    
       this.transaction = {
         stock: '',
-        quantity: '',
-        sellprice: '',
-        total: '',
-        totalcom: '',
-        exitSellPrice: ''
+            quantity: '',
+            sellprice: '',
+            total: '',
+            totalcom: ''
       }
          
     },

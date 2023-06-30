@@ -10,11 +10,11 @@ module.exports = (sequalize, DataTypes) =>
             type:DataTypes.STRING
         }, price: {
             type:DataTypes.STRING
-        }, brut: {
+        }, total: {
             type:DataTypes.STRING
         }, tax: {
             type:DataTypes.STRING
-        }, net: {
+        }, totalcom: {
             type:DataTypes.STRING
         }
     }

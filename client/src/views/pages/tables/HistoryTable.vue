@@ -23,7 +23,7 @@ const HistoryTableHeaders = [
   },
   {
     title: 'Brut',
-    key: 'brut',
+    key: 'total',
   },
   {
     title: 'Commision',
@@ -31,7 +31,7 @@ const HistoryTableHeaders = [
   },
   {
     title: 'Net',
-    key: 'net',
+    key: 'totalcom',
   },
 ]
 </script>

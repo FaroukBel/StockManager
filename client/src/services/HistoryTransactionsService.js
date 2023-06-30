@@ -2,11 +2,15 @@ import api from '@/services/api'
 
 export default {
   index (params) {
-    return api().get('history-transaction', {
+    return api().get('history-get-buy-transaction', {
       params: params
     })
   },
-  post (transaction) {
-    return api().post('history-transaction', transaction)
+  postBuy (transaction) {
+    return api().post('history-buy-transaction', transaction)
+  },
+  postSell (transaction) {
+    return api().post('history-sell-transaction', transaction)
   }
+
 }

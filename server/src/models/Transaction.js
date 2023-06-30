@@ -12,6 +12,10 @@ module.exports = (sequalize, DataTypes) =>
             type:DataTypes.NUMBER
         }, pl: {
             type:DataTypes.NUMBER
+        }, tax: {
+            type:DataTypes.NUMBER
+        }, taxtva: {
+            type:DataTypes.NUMBER
         }, totalgain: {
             type:DataTypes.NUMBER
         }

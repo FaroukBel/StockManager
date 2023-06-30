@@ -1,4 +1,3 @@
-
 <template>
   <VForm ref="myForm" @submit.prevent>
     <VRow>
@@ -13,28 +12,32 @@
           />
         </VCol>
 
+
+        <!-- 👉 Date -->
+      <!-- <VCol cols="12" md="6">
+        <v-date-picker
+          v-model="transaction.date"
+          label="Date"
+          :value="currentDate"
+          required
+        />
+      </VCol> -->
+
+
       <!-- 👉 Quantity -->
-      <VCol
-        cols="12"
-        md="6"
-      >
+      <VCol cols="12" md="6">
         <VTextField
           v-model="transaction.quantity"
           label="Quantité"
           placeholder="2341"
           min="0"
           required
-
           type="number"
-            />
+        />
       </VCol>
 
       <!-- 👉 Buy Price -->
-      <VCol
-        cols="12"
-        md="6"
-      >
-    
+      <VCol cols="12" md="6">
         <VTextField
           v-model="transaction.buyprice"
           label="Prix d'achat"
@@ -44,87 +47,73 @@
           required
         />
       </VCol>
-<!-- 👉 Commision -->
-<VCol
-        cols="12"
-        md="6"
-      >
+
+      <!-- 👉 Commission -->
+      <VCol cols="12" md="6">
         <VTextField
-          v-model="transaction.entryBuyPrice"
-          label="Commision"
+          v-model="transaction.tax"
+          label="Commission"
           placeholder="3452.45"
           readonly
           type="number"
+          required
         />
       </VCol>
 
       <!-- 👉 Total -->
-      <VCol
-        cols="12"
-        md="6"
-      >
+      <VCol cols="12" md="6">
         <VTextField
           v-model="transaction.total"
           label="Total"
           placeholder="3452.45"
           readonly
           type="number"
+          required
         />
       </VCol>
-  <!-- 👉 Total -->
-  <VCol
-        cols="12"
-        md="12"
-      >
+
+      <!-- 👉 Total + Commission -->
+      <VCol cols="12" md="12">
         <VTextField
           v-model="transaction.totalcom"
           label="Total + Commission"
           placeholder="3452.45"
           readonly
           type="number"
+          required
         />
       </VCol>
 
-      <VCol
-        cols="12"
-        class="d-flex gap-4"
-      >
-        
-
-        <VBtn
-        
-          color="secondary"
-          variant="tonal"
-          @click="clearForm"
-        >
+      <VCol cols="12" class="d-flex gap-4">
+        <VBtn color="secondary" variant="tonal" @click="clearForm">
           Effacer
         </VBtn>
-        <VBtn 
-        @click="submitForm"
-        color="success">
+        <VBtn @click="submitForm"  color="success">
           Acheter
-          
         </VBtn>
       </VCol>
     </VRow>
   </VForm>
-
 </template>
 
+
 <script>
-import TransactionService from '@/services/TransactionService';
+import HistoryTransactionsService from '@/services/HistoryTransactionsService';
 import { router } from '@/router';
 
 export default {
   data() {
     return {
       transaction: {
+        date: new Date().toISOString().substr(0, 10),
         stock: '',
+        type: 'Achat',
         quantity: '',
         buyprice: '',
         total: '',
-        totalcom: '',
-        entryBuyPrice: ''
+        tax: '',
+        totalcom: ''
+
       },
       valeurOptions: ["Attijariwafa Bank (ATW)",
   "Banque Centrale Populaire (BCP)",
@@ -185,28 +174,39 @@ export default {
   const buyPrice = parseFloat(this.transaction.buyprice);
   if (!isNaN(quantity) && !isNaN(buyPrice)) {
     const buyEntryTax = quantity * buyPrice * 0.007665;
-    this.transaction.entryBuyPrice = buyEntryTax.toFixed(2);
-    this.transaction.totalcom = this.transaction.total + this.transaction.entryBuyPrice;
+    this.transaction.tax = buyEntryTax.toFixed(2);
+    this.transaction.totalcom = parseFloat(this.transaction.total) + parseFloat(this.transaction.tax);
   } else {
     this.transaction.entryBuyPrice = '';
   }
 
     },
     async submitForm() {
-      TransactionService.post(this.transaction)
+      if (
+    !this.transaction.stock ||
+    !this.transaction.quantity ||
+    !this.transaction.buyprice ||
+    !this.transaction.total ||
+    !this.transaction.totalcom
+  ) {
+    alert('Veuillez remplir les champs obligatoires.');
+    return;
+  }
+  HistoryTransactionsService.postBuy(this.transaction)
         .then(() => {
           // Reset form fields after successful submission
           this.transaction = {
+            date: '',
             stock: '',
             quantity: '',
+            type: '',
             buyprice: '',
-            sellprice: '',
             total: '',
-            pl: '',
-            totalgain: ''
+            totalcom: ''
           };
-          router.push('/dashboard');
-          alert('Transaction saved successfully!');
+          location.reload();
+
+          alert('Transaction enregistrée avec succés!');
         })
         .catch((error) => {
           console.error(error);
@@ -219,10 +219,8 @@ export default {
             stock: '',
             quantity: '',
             buyprice: '',
-            sellprice: '',
             total: '',
-            pl: '',
-            totalgain: ''
+            totalcom: ''
           };
          
     },

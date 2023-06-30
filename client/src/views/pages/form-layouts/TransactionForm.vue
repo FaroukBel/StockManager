@@ -91,7 +91,8 @@
       </VCol>
       <!-- 👉 TotalGain -->
       <VCol
-        cols="12">
+        cols="12"
+        md="12">
         <VTextField
 
           v-model="transaction.totalgain"
@@ -101,7 +102,33 @@
           type="number"
         />
       </VCol>
+<!-- 👉 TotalGain -->
+<VCol
+        cols="12"
+        md="6">
+        <VTextField
 
+          v-model="transaction.tax"
+          label="Commision"
+          placeholder="3200.42"
+          readonly
+          type="number"
+        />
+      </VCol>
+
+      <!-- 👉 TotalGain -->
+<VCol
+        cols="12"
+        md="6">
+        <VTextField
+
+          v-model="transaction.taxtva"
+          label="TVA"
+          placeholder="3200.42"
+          readonly
+          type="number"
+        />
+      </VCol>
       <VCol
         cols="12"
         class="d-flex gap-4"
@@ -140,6 +167,8 @@ export default {
         sellprice: '',
         total: '',
         pl: '',
+        tax: '',
+        taxtva: '',
         totalgain: ''
       },
       valeurOptions: ["Attijariwafa Bank (ATW)",
@@ -216,11 +245,13 @@ export default {
         const entryBuyPrice = (quantity * buyPrice) + buyEntryTax;
         const exitSellPrice = (quantity * sellPrice) - sellExitTax;
         const tva = (exitSellPrice - entryBuyPrice) * 0.15;
+        this.transaction.tax = entryBuyPrice + exitSellPrice;
         if(exitSellPrice < entryBuyPrice){
           this.transaction.pl = (exitSellPrice - entryBuyPrice).toFixed(2);
 
         }
         else if(exitSellPrice > entryBuyPrice){
+          this.transaction.taxtva = tva;
           this.transaction.pl = ((exitSellPrice - entryBuyPrice) - tva).toFixed(2);
 
         }
@@ -249,6 +280,8 @@ export default {
             sellprice: '',
             total: '',
             pl: '',
+            tax: '',
+        taxtva: '',
             totalgain: ''
           };
           router.push('/dashboard');
@@ -268,6 +301,8 @@ export default {
             sellprice: '',
             total: '',
             pl: '',
+            tax: '',
+        taxtva: '',
             totalgain: ''
           };
          
