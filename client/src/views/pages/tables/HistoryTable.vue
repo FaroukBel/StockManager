@@ -1,41 +1,50 @@
 <template>
-  <div>
+  <div style="padding: 20px;">
   
     <v-row>
       <v-col cols="3">
-        <v-row>
+
           <v-select
           v-model="selectedStock"
           :items="stockOptions"
           label="Sélectionner une valeur"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           outlined
         ></v-select>
+
+        
+      </v-col>
+      <v-col cols="1">
         <v-btn
         text="X"
-        color="error"
-        height="30px"
-        width="10px"
+        :style="{ color: 'rgb(73, 249, 3) !important' }"
+    
           @click="clearStockSelect">
           
         </v-btn>
-        </v-row>
-        
       </v-col>
       <v-col cols="3">
 
       <v-text-field
       v-model="search"
       label="Rechercher"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
       outlined
     ></v-text-field>
   </v-col>
 
-  <v-col cols="6" class="text-right">
+  <v-col cols="2" class="text-right">
         <v-radio-group v-model="filterType">
 
-            <v-radio value="Tout" label="Tout"></v-radio>
-            <v-radio value="Achat" label="Achat"></v-radio>
-          <v-radio value="Vente" label="Vente"></v-radio>
+            <v-radio 
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+            value="Tout" label="Tout"></v-radio>
+            <v-radio 
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+            value="Achat" label="Achat"></v-radio>
+          <v-radio value="Vente" 
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+          label="Vente"></v-radio>
    
         
         </v-radio-group>
@@ -43,12 +52,27 @@
     </v-row>
     <v-data-table
       height="500"
+          
       fixed-header
       :headers="HistoryTableHeaders"
       :items="filteredTransactions"
       class="text-no-wrap rounded-0 text-sm"
-    ></v-data-table>
+    >
+ 
+  </v-data-table>
   </div>
+  <div class="d-flex justify-content-between">
+  <div class="text-right total-net" >
+    <strong>Total Net Achat: {{ totalNetAchat }} DH</strong>
+  </div>
+  <div class="text-right total-net" >
+    <strong>Total Net Vente: {{ totalNetVente }} DH</strong>
+  </div>
+  <div class="text-right total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
+    <strong>Total Net: {{ totalNetTVA }} DH</strong>
+  </div>
+</div>
+
 </template>
 
 <script>
@@ -61,6 +85,41 @@ export default {
       selectedStock: null,
       search: '',
       filterType: null,
+      totalNet: 0,
+      HistoryTableHeaders : [
+  {
+    title: 'Date',
+    key: 'date',
+  },
+  {
+    title: 'Valeur',
+    key: 'value',
+  },
+  {
+    title: 'Type',
+    key: 'type',
+  },
+  {
+    title: 'Quantité',
+    key: 'quantity',
+  },
+  {
+    title: 'Cours',
+    key: 'price',
+  },
+  {
+    title: 'Brut',
+    key: 'total',
+  },
+  {
+    title: 'Commission',
+    key: 'tax',
+  },
+  {
+    title: 'Net',
+    key: 'totalcom',
+  },
+],
     };
   },
   created() {
@@ -87,9 +146,57 @@ export default {
 
     return true;
   });
+
+  
 },
 
+totalNetAchat() {
+    const totalColumnIndex = this.HistoryTableHeaders.findIndex(
+      (header) => header.key === 'totalcom'
+    );
+    if (totalColumnIndex === -1) return 0;
 
+    return this.filteredTransactions.reduce((total, transaction) => {
+      if (transaction.type.toLowerCase() === 'achat') {
+        const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key]);
+        return total + amount;
+      }
+      return total;
+    }, 0);
+    return total.toFixed(2);
+  },
+
+  totalNetVente() {
+    const totalColumnIndex = this.HistoryTableHeaders.findIndex(
+      (header) => header.key === 'totalcom'
+    );
+    if (totalColumnIndex === -1) return 0;
+
+    return this.filteredTransactions.reduce((total, transaction) => {
+      if (transaction.type.toLowerCase() === 'vente') {
+        const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key]);
+        return total + amount;
+      }
+      return total;
+    }, 0);
+    return total.toFixed(2);
+  },
+  totalNetTVA() {
+    const totalAchat = this.totalNetAchat;
+      const totalVente = this.totalNetVente;
+      if ((totalVente - totalAchat)<0) {
+        return (totalVente - totalAchat).toFixed(2);
+      }
+      else{
+        const revenuetva = (totalVente - totalAchat) * 0.15;
+      const revenue = (totalVente - totalAchat) - revenuetva;
+      return revenue.toFixed(2);
+      }
+      
+  
+  },
+
+    
     stockOptions() {
       return [
       "AFMA SA",
@@ -189,38 +296,28 @@ export default {
 
 <script setup>
 import { VDataTable } from 'vuetify/labs/VDataTable'
-const HistoryTableHeaders = [
-  {
-    title: 'Date',
-    key: 'date',
-  },
-  {
-    title: 'Valeur',
-    key: 'value',
-  },
-  {
-    title: 'Type',
-    key: 'type',
-  },
-  {
-    title: 'Quantité',
-    key: 'quantity',
-  },
-  {
-    title: 'Cours',
-    key: 'price',
-  },
-  {
-    title: 'Brut',
-    key: 'total',
-  },
-  {
-    title: 'Commission',
-    key: 'tax',
-  },
-  {
-    title: 'Net',
-    key: 'totalcom',
-  },
-];
+
 </script>
+
+<style>
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.total-net {
+  font-size: 18px;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+.negative-value{
+ color:red !important;
+}
+.total-net-tva{
+  color: rgb(19, 255, 19);
+}
+</style>

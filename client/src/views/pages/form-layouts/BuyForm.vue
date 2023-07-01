@@ -9,6 +9,8 @@
             label="Valeur"
             placeholder="Select a valeur"
             required
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+
           />
         </VCol>
 
@@ -33,6 +35,8 @@
           min="0"
           required
           type="number"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+
         />
       </VCol>
 
@@ -45,6 +49,7 @@
           type="number"
           min="0"
           required
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
         />
       </VCol>
 
@@ -57,6 +62,8 @@
           readonly
           type="number"
           required
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+
         />
       </VCol>
 
@@ -69,6 +76,9 @@
           readonly
           type="number"
           required
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+
+         
         />
       </VCol>
 
@@ -81,6 +91,8 @@
           readonly
           type="number"
           required
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+
         />
       </VCol>
 
@@ -100,12 +112,19 @@
 <script>
 import HistoryTransactionsService from '@/services/HistoryTransactionsService';
 import { router } from '@/router';
-
+const currentDate = new Date();
+const formattedDate = currentDate.toLocaleString('en-GB', {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+});
 export default {
   data() {
     return {
       transaction: {
-        date: new Date().toISOString().substr(0, 10),
+        date: formattedDate,
         stock: '',
         type: 'Achat',
         quantity: '',
@@ -281,4 +300,5 @@ export default {
   },
 };
 </script>
+
 

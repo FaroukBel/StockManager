@@ -30,6 +30,7 @@ $card-spacer-content: 16px;
 // 👉 Card match height
 .match-height.v-row {
   .v-card {
+    background-color: #fff;
     block-size: 100%;
   }
 }
@@ -50,7 +51,7 @@ $card-spacer-content: 16px;
   ℹ️ We also need !important to get correct color in badge icon
 */
 .text-white {
-  color: #fff !important;
+  color: rgb(73, 249, 3) !important;
 }
 
 .bg-var-theme-background {
@@ -94,11 +95,11 @@ $card-spacer-content: 16px;
 
     .v-btn--icon.v-btn--density-default {
       block-size: calc(var(--v-btn-height) + -10px);
-      color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+      color: black;
       inline-size: calc(var(--v-btn-height) + -8px);
 
       &.v-btn--active {
-        color: #fff;
+        color: rgb(0, 0, 0);
       }
 
       .v-btn__overlay {

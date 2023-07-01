@@ -92,6 +92,7 @@
   }
 
   .v-card {
+    background-color: white;
     @extend %style-scroll-bar;
   }
 }
@@ -161,7 +162,7 @@
 
 // 👉 Switch
 .v-switch .v-selection-control:not(.v-selection-control--dirty) .v-switch__thumb {
-  color: #fff !important;
+  color: rgb(0, 0, 0) !important;
 }
 
 // 👉 Textarea

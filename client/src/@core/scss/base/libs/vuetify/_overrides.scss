@@ -24,7 +24,7 @@ h6,
 .text-button,
 .text-overline,
 .v-card-title {
-  color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+  color:rgb(73, 249, 3) !important;
 }
 
 .v-application,
@@ -32,7 +32,7 @@ h6,
 .text-body-2,
 .text-subtitle-1,
 .text-subtitle-2 {
-  color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+  color: rgb(73, 249, 3) !important;
 }
 
 // 👉 Grid
@@ -208,6 +208,7 @@ h6,
   }
 
   .v-pagination {
+    
     color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
   }
 }
@@ -226,7 +227,7 @@ h6,
   opacity: 1 !important;
 
   &:not(.v-field-label--floating) {
-    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+    color: rgb(73, 249, 3) !important;
   }
 }
 
@@ -280,7 +281,7 @@ h6,
     & input::placeholder,
     input#{&}::placeholder,
     textarea#{&}::placeholder {
-      color: rgba(var(--v-theme-on-surface), var(--v-disabled-opacity)) !important;
+      color: rgb(73, 249, 3) !important;
       opacity: 1 !important;
     }
   }

@@ -9,6 +9,7 @@
             :items="valeurOptions"
             label="Valeur"
             placeholder="Select a valeur"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
             required
           />
         </VCol>
@@ -22,6 +23,7 @@
           v-model="transaction.quantity"
           label="Quantité"
           placeholder="2341"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           min="0"
           required
 
@@ -39,6 +41,7 @@
           v-model="transaction.buyprice"
           label="Prix d'achat"
           placeholder="12.34"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
           min="0"
           required
@@ -55,6 +58,7 @@
           v-model="transaction.sellprice"
           label="Prix de vente"
           placeholder="23.53"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
           min="0"
         />
@@ -69,6 +73,7 @@
           v-model="transaction.total"
           label="Total"
           placeholder="3452.45"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           readonly
           type="number"
         />
@@ -84,6 +89,7 @@
           v-model="transaction.pl"
           label="+/- Value"
           placeholder="3200.42"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           readonly
           type="number"
           
@@ -99,6 +105,7 @@
           label="Total + Gain"
           placeholder="3200.42"
           readonly
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
         />
       </VCol>
@@ -112,6 +119,7 @@
           label="Commision"
           placeholder="3200.42"
           readonly
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
         />
       </VCol>
@@ -126,6 +134,7 @@
           label="TVA"
           placeholder="3200.42"
           readonly
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
         />
       </VCol>
@@ -269,6 +278,8 @@ export default {
     'transaction.total': {
       handler(newValue) {
         this.calculateTotalGain();
+        this.calculatePL();
+
       },
       immediate: true
     },
@@ -300,7 +311,7 @@ export default {
         const entryBuyPrice = (quantity * buyPrice) + buyEntryTax;
         const exitSellPrice = (quantity * sellPrice) - sellExitTax;
         const tva = (exitSellPrice - entryBuyPrice) * 0.15;
-        this.transaction.tax = parseFloat(entryBuyPrice.toFixed(2)) + parseFloat(exitSellPrice.toFixed(2));
+        this.transaction.tax =parseFloat( parseFloat(buyEntryTax.toFixed(2)) + parseFloat(sellExitTax.toFixed(2)));
         if(exitSellPrice < entryBuyPrice){
           this.transaction.pl = (exitSellPrice - entryBuyPrice).toFixed(2);
           this.transaction.taxtva = 0;
@@ -328,6 +339,15 @@ export default {
     },
 
     async submitForm() {
+      if (
+    !this.transaction.stock ||
+    !this.transaction.quantity ||
+    !this.transaction.buyprice ||
+    !this.transaction.sellprice
+  ) {
+    alert('Veuillez remplir les champs obligatoires.');
+    return;
+  }
       TransactionService.post(this.transaction)
         .then(() => {
           // Reset form fields after successful submission
@@ -342,7 +362,7 @@ export default {
         taxtva: '',
             totalgain: ''
           };
-          router.push('/dashboard');
+          location.reload();
           alert('Transaction saved successfully!');
         })
         .catch((error) => {

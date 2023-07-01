@@ -9,6 +9,7 @@
             :items="valeurOptions"
             label="Valeur"
             placeholder="Select a valeur"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
             required
           />
         </VCol>
@@ -23,6 +24,7 @@
           label="Quantité"
           placeholder="2341"
           min="0"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           required
 
           type="number"
@@ -41,6 +43,7 @@
           placeholder="12.34"
           type="number"
           min="0"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           required
         />
       </VCol>
@@ -55,6 +58,8 @@
           placeholder="3452.45"
           readonly
           type="number"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+
         />
       </VCol>
 
@@ -68,6 +73,7 @@
           label="Total"
           placeholder="3452.45"
           readonly
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
         />
       </VCol>
@@ -84,6 +90,8 @@
           placeholder="3452.45"
           readonly
           type="number"
+          :style="{ color: 'rgb(73, 249, 3) !important' }"
+
         />
       </VCol>
 
@@ -116,12 +124,21 @@
 <script>
 import HistoryTransactionsService from '@/services/HistoryTransactionsService';
 import { router } from '@/router';
-
+const currentDate = new Date();
+const formattedDate = currentDate.toLocaleString('en-GB', {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+});
 export default {
+  
   data() {
     return {
+      
       transaction: {
-        date: new Date().toISOString().substr(0, 10),
+        date: formattedDate,
         stock: '',
         type: 'Vente',
         quantity: '',
