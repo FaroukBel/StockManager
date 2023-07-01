@@ -171,26 +171,80 @@ export default {
         taxtva: '',
         totalgain: ''
       },
-      valeurOptions: ["Attijariwafa Bank (ATW)",
-  "Banque Centrale Populaire (BCP)",
-  "BMCE Bank (BMC)",
-  "Société Générale Marocaine de Banques (SGMB)",
-  "Maroc Telecom (IAM)",
-  "Addoha Group (ADD)",
-  "LafargeHolcim Maroc (LHM)",
-  "Centrale Laitière (CENTRA)",
-  "Cosumar (CSR)",
-  "Managem (MNG)",
-  "Ciments du Maroc (CIM)",
-  "Label'Vie (LABEL)",
-  "Taqa Morocco (TAQA)",
-  "CIH Bank (CIH)",
-  "SODEP-Marsa Maroc (MARS)",
-  "Stokvis Nord Afrique (SNA)",
-  "Delattre Levivier Maroc (DLM)",
-  "Wafa Assurance (WAA)",
-  "Douja Promotion Groupe Addoha (DPA)",
-  "Atlanta (ATL)"], // Static list of dropdown options
+      valeurOptions: [  "AFMA SA",
+  "Afric Industries Sa",
+  "Afriquia Gaz",
+  "Agma Lahlou-Tazi",
+  "Akdital",
+  "Alliances",
+  "Aluminum du Maroc",
+  "Aradei Capital",
+  "Atlanta",
+  "Attijariwafa Bank",
+  "Auto Hall",
+  "Auto Nejma",
+  "Balima",
+  "BCP",
+  "Bmce Bank",
+  "Cartier Saada",
+  "CDM",
+  "CIH",
+  "Ciments Du Maroc",
+  "Colorado",
+  "Compagnie Sucrerie Marocaine",
+  "CTM",
+  "Dari Couspate",
+  "Delattre Levivier Maroc",
+  "Delta Holding S.A",
+  "Disty Tech",
+  "Disway",
+  "Douja Prom Addoha",
+  "Ennakl Automobiles SA",
+  "Fenie Brossette",
+  "Hps",
+  "IB Maroc Com",
+  "Immorente Invest",
+  "Involys",
+  "Itissalat Al-Maghrib",
+  "Jet Contractors",
+  "Label Vie",
+  "LafargeHolcim Maroc",
+  "Les Eaux Minerales Oulmes",
+  "Lesieur Cristal",
+  "M2M Group",
+  "Maghreb Oxygene",
+  "Maghrebail",
+  "Managem",
+  "Maroc Leasing",
+  "Marocaine pour le Commerce et l’Industrie Banque",
+  "Marocaine Ste de Therapeutique",
+  "Med Paper",
+  "Micro Data SA",
+  "Miniere Touissit",
+  "Mutandis",
+  "Nationale d’Electrolyse et de Petrochimie Ste",
+  "Realis. Mecaniques",
+  "Rebab Company",
+  "Residences Dar Saada",
+  "Risma",
+  "S2M",
+  "Salafin",
+  "Sanlam Maroc",
+  "SMI",
+  "Societe des Boissons du Maroc",
+  "Societe d’Exploitation des Ports",
+  "Societe Equipement",
+  "Ste de Travaux de Realisation d’Ouvrages et de Con",
+  "Ste Nationale de Siderurgie",
+  "Ste Promotion Pharmaceutique du Maghreb",
+  "Stokvis Nord Afrique",
+  "Taqa Morocco SA",
+  "Timar",
+  "Total Maroc SA",
+  "Travaux Generaux De Construction",
+  "Unimer",
+  "Wafa Assurance",
+  "Zellidja S.A"], // Static list of dropdown options
     };
   },
   watch: {
@@ -229,6 +283,7 @@ export default {
     calculateTotal() {
       const quantity = parseFloat(this.transaction.quantity);
       const buyPrice = parseFloat(this.transaction.buyprice);
+
       if (!isNaN(quantity) && !isNaN(buyPrice)) {
         this.transaction.total = (quantity * buyPrice).toFixed(2);
       } else {
@@ -245,17 +300,20 @@ export default {
         const entryBuyPrice = (quantity * buyPrice) + buyEntryTax;
         const exitSellPrice = (quantity * sellPrice) - sellExitTax;
         const tva = (exitSellPrice - entryBuyPrice) * 0.15;
-        this.transaction.tax = entryBuyPrice + exitSellPrice;
+        this.transaction.tax = parseFloat(entryBuyPrice.toFixed(2)) + parseFloat(exitSellPrice.toFixed(2));
         if(exitSellPrice < entryBuyPrice){
           this.transaction.pl = (exitSellPrice - entryBuyPrice).toFixed(2);
-
+          this.transaction.taxtva = 0;
         }
         else if(exitSellPrice > entryBuyPrice){
-          this.transaction.taxtva = tva;
+          this.transaction.taxtva = tva.toFixed(2);
           this.transaction.pl = ((exitSellPrice - entryBuyPrice) - tva).toFixed(2);
 
         }
       } else {
+        this.transaction.tax = '';
+        this.transaction.taxtva = '';
+
         this.transaction.pl = '';
       }
     },

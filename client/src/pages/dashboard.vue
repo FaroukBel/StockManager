@@ -18,13 +18,12 @@ import wallet from '@images/cards/wallet-info.png'
 <template>
   <VRow>
     <VCol
-    cols="8"
-      md="8"
+    cols="12"
+    md="8"
   
     >
     <VCard title="Ajouter une transaction"
-    cols="8"
-      md="8">
+ >
           <VCardText 
           >
    
