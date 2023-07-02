@@ -349,8 +349,9 @@ totalNetAchat() {
     const transactionId = item.value.id; // Assuming the ID of the item is stored in the 'id' property
     try {
         await HistoryTransactionsService.deleteTransaction(transactionId);
-        this.tableKey += 1;
-        location.reload();
+        this.$emit('tableDeleteRow');
+        
+
       } catch (error) {
         console.error(error);
       }

@@ -351,18 +351,15 @@ export default {
       TransactionService.post(this.transaction)
         .then(() => {
           // Reset form fields after successful submission
-          this.transaction = {
-            stock: '',
-            quantity: '',
-            buyprice: '',
-            sellprice: '',
-            total: '',
-            pl: '',
-            tax: '',
-        taxtva: '',
-            totalgain: ''
-          };
-          location.reload();
+          this.transaction.quantity='';
+          this.transaction.buyprice='';
+          this.transaction.sellprice='';
+          this.transaction.totalgain='';
+          this.transaction.pl='';
+          this.transaction.totaltva='';
+          
+          this.$emit('TransactionAdded');
+
           alert('Transaction saved successfully!');
         })
         .catch((error) => {

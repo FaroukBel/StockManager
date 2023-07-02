@@ -27,7 +27,7 @@ import wallet from '@images/cards/wallet-info.png'
           <VCardText 
           >
    
-      <TransactionForm />
+      <TransactionForm @TransactionAdded="updateTransTable"/>
 
   </VCardText>
 </VCard>
@@ -39,14 +39,14 @@ import wallet from '@images/cards/wallet-info.png'
       md="4"
 
     >
-      <AnalyticsTransactions />
+      <AnalyticsTransactions :key="transTable"/>
     </VCol>
     <VCol cols="12" md="6" class="d-flex flex-row">
     <VCard
     title="Achat"
     >
     <VCardText>
-      <BuyForm />
+      <BuyForm @buyTransactionAdded="updateTable"/>
 
     </VCardText>
 
@@ -59,7 +59,7 @@ import wallet from '@images/cards/wallet-info.png'
     title="Vente">
     <VCardText>
 
-      <SellForm />
+      <SellForm @sellTransactionAdded="updateTable" />
     </VCardText>
 
     </VCard>
@@ -70,7 +70,7 @@ import wallet from '@images/cards/wallet-info.png'
       md="12"
   
     >
-      <AnalyticsCongratulations />
+      <AnalyticsCongratulations  :key="tableKey" />
     </VCol>
 
     
@@ -161,4 +161,23 @@ import wallet from '@images/cards/wallet-info.png'
     
   </VRow>
 </template>
+<script>
+export default {
 
+  data() {
+    return {
+      tableKey: 0,
+      transTable: 0
+    }
+  },
+
+  methods: {
+    updateTable() {
+      this.tableKey++;
+    },
+    updateTransTable(){
+      this.transTable++;
+    }
+  }
+}
+</script>

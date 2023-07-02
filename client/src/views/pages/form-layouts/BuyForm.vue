@@ -2,7 +2,7 @@
   <VForm ref="myForm" @submit.prevent>
     <VRow>
       <!-- 👉 Valeur dropdown -->
-      <VCol cols="12" md="12">
+      <VCol cols="12" md="6">
           <VSelect
             v-model="transaction.stock"
             :items="valeurOptions"
@@ -13,6 +13,9 @@
 
           />
         </VCol>
+      <VCol cols="12" md="6">
+        <v-text-field v-model="transaction.date" type="datetime-local"></v-text-field>
+      </VCol>
 
 
         <!-- 👉 Date -->
@@ -101,7 +104,7 @@
           Effacer
         </VBtn>
         <VBtn @click="submitForm"  color="success">
-          Acheter
+          <span style="color: black;">Acheter</span>
         </VBtn>
       </VCol>
     </VRow>
@@ -274,18 +277,13 @@ export default {
   }
   HistoryTransactionsService.postBuy(this.transaction)
         .then(() => {
-          // Reset form fields after successful submission
-          this.transaction = {
-            date: '',
-            stock: '',
-            quantity: '',
-            type: '',
-            buyprice: '',
-            total: '',
-            totalcom: ''
-          };
-          location.reload();
+          this.transaction.quantity='';
+          this.transaction.buyprice='';
+          this.transaction.totalcom='';
+          this.transaction.total='';
+          this.transaction.tax='';
 
+          this.$emit('buyTransactionAdded');
           alert('Transaction enregistrée avec succés!');
         })
         .catch((error) => {

@@ -3,7 +3,7 @@
   <VForm ref="myForm" @submit.prevent>
     <VRow>
       <!-- 👉 Valeur dropdown -->
-      <VCol cols="12" md="12">
+      <VCol cols="12" md="6">
           <VSelect
             v-model="transaction.stock"
             :items="valeurOptions"
@@ -13,6 +13,11 @@
             required
           />
         </VCol>
+
+        <VCol cols="12" md="6">
+        <v-text-field  v-model="transaction.date" type="datetime-local"></v-text-field>
+      </VCol>
+
 
       <!-- 👉 Quantity -->
       <VCol
@@ -278,22 +283,22 @@ export default {
     !this.transaction.sellprice ||
     !this.transaction.total ||
     !this.transaction.totalcom
-  ) {
+  ) 
+  {
     alert('Veuillez remplir les champs obligatoires.');
     return;
   }
 
   HistoryTransactionsService.postSell(this.transaction)
         .then(() => {
-          // Reset form fields after successful submission
-          this.transaction = {
-            stock: '',
-            quantity: '',
-            sellprice: '',
-            total: '',
-            totalcom: ''
-          };
-          location.reload();
+        
+          this.transaction.quantity='';
+          this.transaction.sellprice='';
+          this.transaction.totalcom='';
+          this.transaction.total='';
+          this.transaction.tax='';
+
+          this.$emit('sellTransactionAdded');
           alert('Transaction enregistrée avec succés!');
         })
         .catch((error) => {
