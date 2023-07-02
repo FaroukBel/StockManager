@@ -21,18 +21,20 @@ const upgradeBanner = computed(() => {
 </script>
 
 <template>
-  <VerticalNavLayout>
+  <VerticalNavLayout >
     <!-- 👉 navbar -->
     <template #navbar="{ toggleVerticalOverlayNavActive }">
       <div class="d-flex h-100 align-center">
         <!-- 👉 Vertical nav toggle in overlay mode -->
         <IconBtn
           class="ms-n3 d-lg-none"
-          @click="toggleVerticalOverlayNavActive(true)"
+          @click="toggleVerticalOverlayNavActive(false)"
         >
           <VIcon icon="bx-menu" />
         </IconBtn>
-
+        <h1 class="leading-normal">
+            Boursier
+          </h1>
         <!-- 👉 Search -->
         <div
           class="d-flex align-center cursor-pointer"
@@ -42,8 +44,7 @@ const upgradeBanner = computed(() => {
      
 
           <span class="d-none d-md-flex align-center text-disabled">
-  <span class="me-3 larger-span">Solde</span>
-  <span class="me-3 larger-span">200322.53 DH</span>
+
 </span>
         </div>
 

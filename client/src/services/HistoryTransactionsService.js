@@ -6,11 +6,15 @@ export default {
       params: params
     })
   },
+  
   postBuy (transaction) {
     return api().post('history-buy-transaction', transaction)
   },
   postSell (transaction) {
     return api().post('history-sell-transaction', transaction)
+  },
+  deleteTransaction(transactionId) {
+    return api().delete(`history-delete-transaction/${transactionId}`);
   }
 
 }

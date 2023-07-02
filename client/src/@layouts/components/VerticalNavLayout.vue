@@ -78,6 +78,7 @@ export default defineComponent({
 
   .layout-content-wrapper {
     display: flex;
+    padding-inline-start: 0 !important;
     flex-direction: column;
     flex-grow: 1;
     min-block-size: calc(var(--vh, 1vh) * 100);

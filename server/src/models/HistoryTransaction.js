@@ -27,6 +27,8 @@ module.exports = (sequalize, DataTypes) =>
             type:DataTypes.STRING
         }, totalcom: {
             type:DataTypes.STRING
+        }, bank: {
+            type:DataTypes.STRING
         }
     }
 );

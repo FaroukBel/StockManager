@@ -16,7 +16,8 @@ module.exports = (app) => {
     app.get('/transaction', 
     TransactionController.getTransactions),
     app.post('/transaction', 
-    TransactionController.storeTransaction)
+    TransactionController.storeTransaction),
+    app.delete('/history-delete-transaction/:transactionId', HistoryTransctionController.deleteTransaction);
 
     
 }

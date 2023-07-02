@@ -31,7 +31,7 @@
         <VTextField
           v-model="transaction.quantity"
           label="Quantité"
-          placeholder="2341"
+          placeholder=""
           min="0"
           required
           type="number"
@@ -45,7 +45,7 @@
         <VTextField
           v-model="transaction.buyprice"
           label="Prix d'achat"
-          placeholder="12.34"
+          placeholder=""
           type="number"
           min="0"
           required
@@ -58,7 +58,7 @@
         <VTextField
           v-model="transaction.tax"
           label="Commission"
-          placeholder="3452.45"
+          placeholder=""
           readonly
           type="number"
           required
@@ -72,7 +72,7 @@
         <VTextField
           v-model="transaction.total"
           label="Total"
-          placeholder="3452.45"
+          placeholder=""
           readonly
           type="number"
           required
@@ -87,7 +87,7 @@
         <VTextField
           v-model="transaction.totalcom"
           label="Total + Commission"
-          placeholder="3452.45"
+          placeholder=""
           readonly
           type="number"
           required
@@ -233,6 +233,13 @@ export default {
  
   },
   methods: {
+    handleDataUpdate(data) {
+      // Do something with the data received from TransactionForm
+      // For example, you can store it in a component's data property
+      this.dataFromTransactionForm = data;
+    },
+
+
     calculateTotal() {
       const quantity = parseFloat(this.transaction.quantity);
       const buyPrice = parseFloat(this.transaction.buyprice);

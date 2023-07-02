@@ -11,6 +11,7 @@ $header: ".layout-navbar";
 }
 
 .layout-wrapper.layout-nav-type-vertical {
+  
   // SECTION  Layout Navbar
   // 👉 Elevated navbar
   @if variables.$vertical-nav-navbar-style == "elevated" {

@@ -22,7 +22,7 @@
         <VTextField
           v-model="transaction.quantity"
           label="Quantité"
-          placeholder="2341"
+          placeholder=""
           min="0"
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           required
@@ -40,7 +40,7 @@
         <VTextField
           v-model="transaction.sellprice"
           label="Prix de vente"
-          placeholder="12.34"
+          placeholder=""
           type="number"
           min="0"
           :style="{ color: 'rgb(73, 249, 3) !important' }"
@@ -55,7 +55,7 @@
         <VTextField
           v-model="transaction.tax"
           label="Commision"
-          placeholder="3452.45"
+          placeholder=""
           readonly
           type="number"
           :style="{ color: 'rgb(73, 249, 3) !important' }"
@@ -71,7 +71,7 @@
         <VTextField
           v-model="transaction.total"
           label="Total"
-          placeholder="3452.45"
+          placeholder=""
           readonly
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
@@ -87,7 +87,7 @@
         <VTextField
           v-model="transaction.totalcom"
           label="Total - Commission"
-          placeholder="3452.45"
+          placeholder=""
           readonly
           type="number"
           :style="{ color: 'rgb(73, 249, 3) !important' }"

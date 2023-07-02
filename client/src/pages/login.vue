@@ -49,7 +49,7 @@ const isPasswordVisible = ref(false)
               <VTextField
                 v-model="username"
                 autofocus
-                placeholder="23087263"
+                placeholder=""
                 label="Login"
                 type="username"
               />

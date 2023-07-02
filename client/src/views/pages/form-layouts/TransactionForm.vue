@@ -22,7 +22,7 @@
         <VTextField
           v-model="transaction.quantity"
           label="Quantité"
-          placeholder="2341"
+          placeholder=""
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           min="0"
           required
@@ -40,7 +40,7 @@
         <VTextField
           v-model="transaction.buyprice"
           label="Prix d'achat"
-          placeholder="12.34"
+          placeholder=""
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
           min="0"
@@ -57,7 +57,7 @@
         <VTextField
           v-model="transaction.sellprice"
           label="Prix de vente"
-          placeholder="23.53"
+          placeholder=""
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
           min="0"
@@ -72,7 +72,7 @@
         <VTextField
           v-model="transaction.total"
           label="Total"
-          placeholder="3452.45"
+          placeholder=""
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           readonly
           type="number"
@@ -88,7 +88,7 @@
 
           v-model="transaction.pl"
           label="+/- Value"
-          placeholder="3200.42"
+          placeholder=""
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           readonly
           type="number"
@@ -103,7 +103,7 @@
 
           v-model="transaction.totalgain"
           label="Total + Gain"
-          placeholder="3200.42"
+          placeholder=""
           readonly
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
@@ -117,7 +117,7 @@
 
           v-model="transaction.tax"
           label="Commision"
-          placeholder="3200.42"
+          placeholder=""
           readonly
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"
@@ -132,7 +132,7 @@
 
           v-model="transaction.taxtva"
           label="TVA"
-          placeholder="3200.42"
+          placeholder=""
           readonly
           :style="{ color: 'rgb(73, 249, 3) !important' }"
           type="number"

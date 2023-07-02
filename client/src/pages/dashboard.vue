@@ -161,3 +161,4 @@ import wallet from '@images/cards/wallet-info.png'
     
   </VRow>
 </template>
+
