@@ -34,8 +34,23 @@ const getTransactions = async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   };
+
+  const deleteAllTransactions = async (req, res) => {
+    try {
+      await Transaction.destroy({
+        where: {},
+        truncate: true
+      });
+  
+      res.json({ message: 'All transactions deleted successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
 module.exports = {
-   
+   deleteAllTransactions,
     getTransactions,
     storeTransaction
   }

@@ -74,9 +74,44 @@ const deleteTransaction = async (req, res) => {
   }
 };
 
+
+const updateTransaction = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const { date, stock, type, quantity, price, total, tax, totalcom, bank } = req.body;
+
+    // Check if the transaction exists
+    const transaction = await HistoryTransaction.findByPk(transactionId);
+    if (!transaction) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    // Update the transaction with the new values
+    transaction.date = date;
+    transaction.value = stock;
+    transaction.type = type;
+    transaction.quantity = quantity;
+    transaction.price = price;
+    transaction.total = total;
+    transaction.tax = tax;
+    transaction.totalcom = totalcom;
+    transaction.bank = bank;
+
+    // Save the updated transaction
+    await transaction.save();
+
+    res.json(transaction);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 module.exports = {
   getTransactions,
   storeSellTransaction,
   storeBuyTransaction,
-  deleteTransaction
+  deleteTransaction,
+  updateTransaction
 };

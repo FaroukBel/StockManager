@@ -183,11 +183,12 @@ $alert-prepend-icon-font-size: 1.125rem !important;
 
 // 👉 VTable
 .v-table {
+ 
   color: rgb(73, 249, 3) !important;
-
   th {
     color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)) !important;
     font-size: 0.75rem;
+
     text-align: center !important;
     text-transform: uppercase;
 

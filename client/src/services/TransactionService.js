@@ -8,5 +8,11 @@ export default {
   },
   post (transaction) {
     return api().post('transaction', transaction)
+  },
+  delete(){
+    return api().delete(`delete-transaction`);
+
+
   }
+
 }

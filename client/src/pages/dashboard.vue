@@ -6,6 +6,7 @@ import AnalyticsProfitReport from '@/views/dashboard/AnalyticsProfitReport.vue'
 import AnalyticsTotalRevenue from '@/views/dashboard/AnalyticsTotalRevenue.vue'
 import AnalyticsTransactions from '@/views/dashboard/AnalyticsTransactions.vue'
 import TransactionForm from '@/views/pages/form-layouts/TransactionForm.vue'
+import MedianPrice from '@/views/dashboard/MedianPrice.vue'
 import BuyForm from '@/views/pages/form-layouts/BuyForm.vue'
 import SellForm from '@/views/pages/form-layouts/SellForm.vue'
 // 👉 Images
@@ -39,8 +40,25 @@ import wallet from '@images/cards/wallet-info.png'
       md="4"
 
     >
+      <AnalyticsTransactions @TransactionAdded="updateTransTable" :key="transTable"/>
+    </VCol>
+    <VCol
+      cols="12"
+      md="6"
+
+    >
+      <MedianPrice />
+    </VCol>
+
+    <VCol
+      cols="12"
+      md="6"
+
+    >
       <AnalyticsTransactions :key="transTable"/>
     </VCol>
+
+
     <VCol cols="12" md="6" class="d-flex flex-row">
     <VCard
     title="Achat"
@@ -167,7 +185,8 @@ export default {
   data() {
     return {
       tableKey: 0,
-      transTable: 0
+      transTable: 0,
+      tableDelete:0
     }
   },
 
@@ -178,6 +197,7 @@ export default {
     updateTransTable(){
       this.transTable++;
     }
+   
   }
 }
 </script>

@@ -7,6 +7,8 @@ module.exports = (app) => {
     AuthenticationController.register),
     app.post('/login',
     AuthenticationController.login),
+    app.post('/history-update/:transactionId',
+    HistoryTransctionController.updateTransaction),
     app.get('/history-get-buy-transaction',
     HistoryTransctionController.getTransactions),
     app.post('/history-buy-transaction',
@@ -17,8 +19,10 @@ module.exports = (app) => {
     TransactionController.getTransactions),
     app.post('/transaction', 
     TransactionController.storeTransaction),
-    app.delete('/history-delete-transaction/:transactionId', HistoryTransctionController.deleteTransaction);
-
+    app.delete('/history-delete-transaction/:transactionId',
+     HistoryTransctionController.deleteTransaction),
+    app.delete('/delete-transaction', 
+    TransactionController.deleteAllTransactions)
     
 }
  

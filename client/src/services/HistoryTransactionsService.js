@@ -15,6 +15,10 @@ export default {
   },
   deleteTransaction(transactionId) {
     return api().delete(`history-delete-transaction/${transactionId}`);
+  },
+  updateTransaction(transactionId){
+    return api().update(`history-update/${transactionId}`);
+
   }
 
 }
