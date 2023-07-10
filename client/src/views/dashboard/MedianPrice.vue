@@ -1,22 +1,3 @@
-<script setup>
-import { ref } from 'vue';
-
-
-const moreList = []; // Define your 'moreList' data if required
-
-const transactions = ref([]);
-
-async function fetchTransactions() {
-  try {
-    const response = await TransactionService.index();
-    transactions.value = response.data;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-fetchTransactions();
-</script>
 
 <template>
   <v-card>

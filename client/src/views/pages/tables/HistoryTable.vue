@@ -75,7 +75,7 @@
           elevation="0"
           icon
           color="green"
-          v-on:click="this.editItem(item)"
+          v-on:click="this.saveItem(item)"
         >
           <v-icon dark>ri:save-2-line</v-icon>
         </v-btn>
@@ -425,9 +425,10 @@ export default {
     },
 
     async saveItem(item) {
-      this.transaction.bank = item.value.bank
-      HistoryTransactionsService.update(this.transaction)
+      this.transaction = item;
+      HistoryTransactionsService.updateTransaction(this.transaction)
         .then(() => {
+          
           alert('Transaction enregistrée avec succés!')
         })
         .catch((error) => {

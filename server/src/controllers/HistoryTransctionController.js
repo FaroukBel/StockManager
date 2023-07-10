@@ -80,13 +80,13 @@ const updateTransaction = async (req, res) => {
     const { transactionId } = req.params;
     const { date, stock, type, quantity, price, total, tax, totalcom, bank } = req.body;
 
-    // Check if the transaction exists
     const transaction = await HistoryTransaction.findByPk(transactionId);
     if (!transaction) {
+      
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
-    // Update the transaction with the new values
+    // // Update the transaction with the new values
     transaction.date = date;
     transaction.value = stock;
     transaction.type = type;

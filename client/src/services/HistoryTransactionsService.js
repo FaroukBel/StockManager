@@ -17,7 +17,7 @@ export default {
     return api().delete(`history-delete-transaction/${transactionId}`);
   },
   updateTransaction(transactionId){
-    return api().update(`history-update/${transactionId}`);
+    return api().post(`history-update/${transactionId}`);
 
   }
 
