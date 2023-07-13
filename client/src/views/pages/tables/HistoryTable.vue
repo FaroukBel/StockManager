@@ -2,22 +2,13 @@
   <div style="padding: 20px;">
     <v-row class="d-flex">
       <v-col cols="3">
-        <v-select
-          v-model="selectedStock"
-          :items="stockOptions"
-          label="Sélectionner une valeur"
-          :style="{ color: 'rgb(73, 249, 3) !important' }"
-          outlined
-        ></v-select>
+        <v-select v-model="selectedStock" :items="stockOptions" label="Sélectionner une valeur"
+          :style="{ color: 'rgb(73, 249, 3) !important' }" outlined></v-select>
       </v-col>
 
       <v-col cols="3">
-        <v-text-field
-          v-model="search"
-          label="Rechercher"
-          :style="{ color: 'rgb(73, 249, 3) !important' }"
-          outlined
-        ></v-text-field>
+        <v-text-field v-model="search" label="Rechercher" :style="{ color: 'rgb(73, 249, 3) !important' }"
+          outlined></v-text-field>
       </v-col>
       <v-col cols="1">
         <v-btn text="X" :style="{ color: 'rgb(73, 249, 3) !important' }" @click="clearStockSelect">
@@ -27,81 +18,37 @@
       <v-col cols="4" class="text-right">
         <v-radio-group v-model="filterType" :value="'Tout'">
           <div style="display: flex; flex-direction: row; justify-content: space-between;">
-            <v-radio
-              :style="{ color: 'rgb(73, 249, 3) !important' }"
-              value="Tout"
-              label="Tout"
-            ></v-radio>
-            <v-radio
-              :style="{ color: 'rgb(73, 249, 3) !important' }"
-              value="Achat"
-              label="Achat"
-            ></v-radio>
-            <v-radio
-              value="Vente"
-              :style="{ color: 'rgb(73, 249, 3) !important' }"
-              label="Vente"
-            ></v-radio>
+            <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Tout" label="Tout"></v-radio>
+            <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Achat" label="Achat"></v-radio>
+            <v-radio value="Vente" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Vente"></v-radio>
           </div>
         </v-radio-group>
       </v-col>
     </v-row>
-    <v-data-table
-      :key="tableKey"
-      ref="myTable"
-      height="500"
-      fixed-header
-      :headers="HistoryTableHeaders"
-      :items="filteredTransactions"
-      class="text-no-wrap rounded-0 text-sm"
-      return-object
-      v-model="selected"
-      :item-value="(filteredTransactions) => `${filteredTransactions.id}`"
-      show-select
-    >
+    <v-data-table :key="tableKey" ref="myTable" height="500" fixed-header :headers="HistoryTableHeaders"
+      :items="filteredTransactions" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
+      :item-value="(filteredTransactions) => `${filteredTransactions.id}`" show-select>
       <template v-slot:item.type="{ item }">
-        <div
-          v-bind:style="
-            item.value.type === 'Achat' ? 'background-color: green;' : 'background-color: red; '
-          "
-        >
+        <div v-bind:style="item.value.type === 'Achat' ? 'background-color: rgb(113,221,55); color:black; ' : 'background-color: rgb(255,62,29);  '
+          ">
           <p>{{ item.value.type }}</p>
         </div>
       </template>
 
       <template v-slot:item.save="{ item }">
-        <v-btn
-          :loading="item.loading"
-          elevation="0"
-          icon
-          color="green"
-          v-on:click="this.saveItem(item)"
-        >
+        <v-btn :loading="item.loading" elevation="0" icon color="green" v-on:click="this.saveItem(item)">
           <v-icon dark>ri:save-2-line</v-icon>
         </v-btn>
       </template>
       <template v-slot:item.edit="{ item }">
-        <v-btn
-          :loading="item.loading"
-          elevation="0"
-          icon
-          color="green"
-          v-on:click="this.editItem(item)"
-        >
+        <v-btn :loading="item.loading" elevation="0" icon color="green" v-on:click="this.editItem(item)">
           <v-icon dark>mdi-pencil</v-icon>
         </v-btn>
       </template>
       <template v-slot:item.delete="{ item }">
-        <v-btn
-          :loading="item.loading"
-          elevation="0"
-          icon
-          color="red !important"
-          v-on:click="this.deleteItem(item)"
-        >
+        <v-btn :loading="item.loading" elevation="0" icon color="red !important" v-on:click="this.deleteItem(item)">
           <v-icon dark>mdi-delete</v-icon>
-        </v-btn></template
-      >
+        </v-btn></template>
 
       <template v-slot:item.bank="{ item }">
         <v-text-field class="no-border"></v-text-field>
@@ -114,23 +61,34 @@
   </div>
 
   <div class="d-flex justify-content-between">
-    <div class="text-right total-net">
-      <strong>Total Actions Achat: {{ totalQuantityAchat }}</strong>
+    <div class="text-left total-net">
+      <div >CUMP Achat: <v-text-field readonly :value="weightedAchat"> </v-text-field></div>
     </div>
-    <div class="text-right total-net">
-      <strong>Total Actions Vente: {{ totalQuantityVente }}</strong>
-    </div>
-    <div class="text-right total-net">
-      <strong>Total Net Achat: {{ this.formatCurrency(totalNetAchat) }}</strong>
-    </div>
-    <div class="text-right total-net">
-      <strong>Total Net Vente: {{ this.formatCurrency(totalNetVente) }}</strong>
-    </div>
-
-    <div class="text-right total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
-      <span>Total Net: {{ this.formatCurrency(totalNetTVA) }}</span>
+    <div class="text-left total-net">
+      <div>CUMP Vente: <v-text-field readonly :value="weightedVente"></v-text-field></div>
     </div>
   </div>
+  
+  <div class="d-flex justify-content-between">
+    <div class="text-left total-net">
+      <div>Total Actions Achat: <v-text-field readonly :value="totalQuantityAchat"> </v-text-field></div>
+    </div>
+    <div class="text-left total-net">
+      <div>Total Actions Vente: <v-text-field readonly :value="totalQuantityVente"></v-text-field></div>
+    </div>
+    <div class="text-left total-net">
+      <div>Total Net Achat: <v-text-field readonly :value="formattedTotalNetAchat"></v-text-field></div>
+    </div>
+    <div class="text-left total-net">
+      <div>Total Net Vente: <v-text-field readonly :value="formattedTotalNetVente"></v-text-field></div>
+    </div>
+
+    <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
+      <span>Total Net: <v-text-field readonly  :value="formattedTotalNet"></v-text-field></span>
+    </div>
+  </div>
+
+
 </template>
 
 <script>
@@ -202,6 +160,18 @@ export default {
     this.fetchTransactions()
   },
   computed: {
+    formattedTotalNetAchat() {
+      // Format the totalNetAchat value using the formatCurrency() method
+      return this.formatCurrency(this.totalNetAchat);
+    },
+    formattedTotalNet() {
+      // Format the totalNetAchat value using the formatCurrency() method
+      return this.formatCurrency(this.totalNetTVA);
+    },
+    formattedTotalNetVente() {
+      // Format the totalNetAchat value using the formatCurrency() method
+      return this.formatCurrency(this.totalNetVente);
+    },
     filteredTransactions() {
       if (!this.selectedStock && !this.search && !this.filterType) {
         return this.transactions
@@ -231,6 +201,74 @@ export default {
       })
     },
 
+
+
+    weightedVente() {
+      const quantityVenteColumnIndex = this.HistoryTableHeaders.findIndex(
+        (header) => header.key === 'quantity'
+      )
+      if (quantityVenteColumnIndex === -1) return 0
+
+      const priceVenteColumnIndex = this.HistoryTableHeaders.findIndex(
+        (header) => header.key === 'price'
+      )
+      if (priceVenteColumnIndex === -1) return 0
+
+      let totalWeightedPrice = 0;
+
+      let totalQuantity = 0;
+
+      this.filteredTransactions.reduce((total, transaction) => {
+        if (transaction.type.toLowerCase() === 'vente') {
+          const quantityVente = parseFloat(transaction[this.HistoryTableHeaders[quantityVenteColumnIndex].key])
+          const priceVente = parseFloat(transaction[this.HistoryTableHeaders[priceVenteColumnIndex].key])
+
+          totalWeightedPrice += priceVente * quantityVente;
+          totalQuantity += quantityVente;
+          console.log(totalWeightedPrice)
+          console.log(totalQuantity)
+        }
+      return (totalWeightedPrice / totalQuantity).toFixed(2);
+
+
+      }, 0)
+      return (totalWeightedPrice / totalQuantity).toFixed(2);
+
+    },
+
+
+    weightedAchat() {
+      const quantityVenteColumnIndex = this.HistoryTableHeaders.findIndex(
+        (header) => header.key === 'quantity'
+      )
+      if (quantityVenteColumnIndex === -1) return 0
+
+      const priceVenteColumnIndex = this.HistoryTableHeaders.findIndex(
+        (header) => header.key === 'price'
+      )
+      if (priceVenteColumnIndex === -1) return 0
+
+      let totalWeightedPrice = 0;
+
+      let totalQuantity = 0;
+
+      this.filteredTransactions.reduce((total, transaction) => {
+        if (transaction.type.toLowerCase() === 'achat') {
+          const quantityVente = parseFloat(transaction[this.HistoryTableHeaders[quantityVenteColumnIndex].key])
+          const priceVente = parseFloat(transaction[this.HistoryTableHeaders[priceVenteColumnIndex].key])
+
+          totalWeightedPrice += priceVente * quantityVente;
+          totalQuantity += quantityVente;
+          console.log(totalWeightedPrice)
+          console.log(totalQuantity)
+        }
+      return (totalWeightedPrice / totalQuantity).toFixed(2);
+
+
+      }, 0)
+      return (totalWeightedPrice / totalQuantity).toFixed(2);
+
+    },
     totalNetAchat() {
       const totalColumnIndex = this.HistoryTableHeaders.findIndex(
         (header) => header.key === 'totalcom'
@@ -428,7 +466,7 @@ export default {
       this.transaction = item;
       HistoryTransactionsService.updateTransaction(this.transaction)
         .then(() => {
-          
+
           alert('Transaction enregistrée avec succés!')
         })
         .catch((error) => {
@@ -461,7 +499,11 @@ export default {
       } catch (error) {
         console.error(error)
       }
-    }
+    },
+
+
+
+
   }
 }
 </script>
@@ -491,6 +533,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 }
 
 .total-net-tva {
+
   color: rgb(19, 255, 19);
 }
 

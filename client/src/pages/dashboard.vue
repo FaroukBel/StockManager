@@ -9,6 +9,7 @@ import TransactionForm from '@/views/pages/form-layouts/TransactionForm.vue'
 import MedianPrice from '@/views/dashboard/MedianPrice.vue'
 import BuyForm from '@/views/pages/form-layouts/BuyForm.vue'
 import SellForm from '@/views/pages/form-layouts/SellForm.vue'
+import Shares from '@/views/pages/form-layouts/Shares.vue'
 // 👉 Images
 import chart from '@images/cards/chart-success.png'
 import card from '@images/cards/credit-card-primary.png'
@@ -49,15 +50,19 @@ import wallet from '@images/cards/wallet-info.png'
     >
       <MedianPrice />
     </VCol>
+    <VCol cols="12" md="6" class="d-flex flex-row">
 
-    <VCol
-      cols="12"
-      md="6"
-
+    <VCard
+    title="Dividendes"
     >
-      <AnalyticsTransactions :key="transTable"/>
-    </VCol>
+    <VCardText>
 
+      <Shares />
+    </VCardText>
+
+  </VCard>
+    </VCol>
+    
 
     <VCol cols="12" md="6" class="d-flex flex-row">
     <VCard
