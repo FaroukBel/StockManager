@@ -2,14 +2,18 @@
   <VForm ref="myForm" @submit.prevent>
     <VRow>
       <!-- 👉 Valeur dropdown -->
-      <VCol cols="12" md="6">
-        <VSelect v-model="transaction.stock" :items="valeurOptions" label="Valeur" placeholder="Select a valeur" required
+      <VCol cols="12" md="12">
+        <VSelect 
+        clearable
+         v-model="transaction.stock" :items="valeurOptions" label="Valeur" placeholder="Sélectionnez une valeur" required
           :style="{ color: 'rgb(73, 249, 3) !important' }" />
       </VCol>
       <VCol cols="12" md="6">
-        <v-text-field v-model="transaction.date" type="datetime-local"></v-text-field>
+        <v-text-field v-model="transaction.date_engagement" label="Date de d'engagement" type="datetime-local"></v-text-field>
       </VCol>
-
+      <VCol cols="12" md="6">
+        <v-text-field v-model="transaction.date_detachement" label="Date de détachement" type="datetime-local"></v-text-field>
+      </VCol>
 
       <!-- 👉 Date -->
       <!-- <VCol cols="12" md="6">
@@ -57,7 +61,7 @@
           Effacer
         </VBtn>
         <VBtn @click="submitForm" color="success">
-          <span style="color: black;">Acheter</span>
+          <span style="color: black;">Ajouter</span>
         </VBtn>
       </VCol>
     </VRow>
@@ -80,9 +84,9 @@ export default {
   data() {
     return {
       transaction: {
-        date: formattedDate,
+        date_engagement: formattedDate,
+        date_detachement: formattedDate,
         stock: '',
-        type: 'Achat',
         quantity: '',
         buyprice: '',
         total: '',
@@ -205,11 +209,9 @@ export default {
       const quantity = parseFloat(this.transaction.quantity);
       const buyPrice = parseFloat(this.transaction.buyprice);
       if (!isNaN(quantity) && !isNaN(buyPrice)) {
-        const buyEntryTax = quantity * buyPrice * 0.007665;
-        this.transaction.tax = buyEntryTax.toFixed(2);
-        this.transaction.totalcom = parseFloat(this.transaction.total) + parseFloat(this.transaction.tax);
-      } else {
-        this.transaction.entryBuyPrice = '';
+        
+        this.transaction.tax = this.transaction.total * 0.15;
+        this.transaction.totalcom = parseFloat(this.transaction.total) - parseFloat(this.transaction.tax);
       }
 
     },
@@ -224,14 +226,15 @@ export default {
         alert('Veuillez remplir les champs obligatoires.');
         return;
       }
-      HistoryTransactionsService.postBuy(this.transaction)
+
+      HistoryTransactionsService.postShare(this.transaction)
         .then(() => {
           this.transaction.quantity = '';
           this.transaction.buyprice = '';
           this.transaction.totalcom = '';
           this.transaction.total = '';
           this.transaction.tax = '';
-
+          
           this.$emit('buyTransactionAdded');
           alert('Transaction enregistrée avec succés!');
         })

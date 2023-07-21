@@ -4,10 +4,11 @@
       <!-- 👉 Valeur dropdown -->
       <VCol cols="12" md="6">
           <VSelect
+          clearable
             v-model="transaction.stock"
             :items="valeurOptions"
             label="Valeur"
-            placeholder="Select a valeur"
+            placeholder="Sélectionnez une valeur"
             required
           :style="{ color: 'rgb(73, 249, 3) !important' }"
 

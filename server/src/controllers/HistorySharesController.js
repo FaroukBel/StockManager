@@ -1,66 +1,45 @@
-const { HistoryTransaction } = require('../models');
+const { HistoryShares } = require('../models');
 
-const getTransactions = async (req, res) => {
+const getShareTransactions = async (req, res) => {
   try {
-    const transactions = await HistoryTransaction.findAll();
-    res.json(transactions);
+    const sharesTransactions = await HistoryShares.findAll();
+    res.json(sharesTransactions);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-const storeBuyTransaction = async (req, res) => {
+
+const storeShareTransaction = async (req, res) => {
   try {
-    const { date, stock, type, quantity, buyprice, total, tax, totalcom, bank } = req.body;
+    const { date_engagement, date_detachement, stock, quantity, buyprice, total, tax, totalcom } = req.body;
+    console.log(req.body)
     const value = stock;
-    const price = buyprice;
-    const buyhistorytransaction = await HistoryTransaction.create({
-      date,
+    const type = "div"
+    const price = parseFloat(buyprice);
+    const sharehistorytransaction = await HistoryShares.create({
+        date_engagement,
+        date_detachement,
       value,
       type,
       quantity,
       price,
       total,
       tax,
-      totalcom,
-      bank
+      totalcom
     });
-    res.json(buyhistorytransaction);
+    res.json(sharehistorytransaction);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-const storeSellTransaction = async (req, res) => {
-  try {
-    const { date, stock, type, quantity, sellprice, total, tax, totalcom, bank } = req.body;
-    const value = stock;
-    const price = parseFloat(sellprice);
-    const sellhistorytransaction = await HistoryTransaction.create({
-      date,
-      value,
-      type,
-      quantity,
-      price,
-      total,
-      tax,
-      totalcom,
-      bank
-    });
-    res.json(sellhistorytransaction);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-
-const deleteTransaction = async (req, res) => {
+const deleteShareTransaction = async (req, res) => {
   try {
     const { transactionId } = req.params;
-    const transaction = await HistoryTransaction.findByPk(transactionId);
+    const transaction = await HistoryShares.findByPk(transactionId);
 
     if (!transaction) {
       return res.status(404).json({ error: 'Transaction not found' });
@@ -110,9 +89,9 @@ const updateTransaction = async (req, res) => {
 
 
 module.exports = {
-  getTransactions,
-  storeSellTransaction,
-  storeBuyTransaction,
-  deleteTransaction,
+    storeShareTransaction,
+  
+  getShareTransactions,
+  deleteShareTransaction,
   updateTransaction
 };

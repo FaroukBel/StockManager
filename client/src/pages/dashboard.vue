@@ -96,8 +96,8 @@ import wallet from '@images/cards/wallet-info.png'
       <AnalyticsCongratulations  :key="tableKey" />
     </VCol>
 
-    
- 
+
+
 
     <!-- 👉 Total Revenue -->
     <VCol

@@ -2,7 +2,7 @@
   <div style="padding: 20px;">
     <v-row class="d-flex">
       <v-col cols="3">
-        <v-select v-model="selectedStock" :items="stockOptions" label="Sélectionner une valeur"
+        <v-select clearable v-model="selectedStock"  v-on:change="this.onShareSelected"  :items="stockOptions" label="Sélectionner une valeur"
           :style="{ color: 'rgb(73, 249, 3) !important' }" outlined></v-select>
       </v-col>
 
@@ -15,18 +15,20 @@
         </v-btn>
       </v-col>
 
-      <v-col cols="4" class="text-right">
+      <v-col cols="5" class="text-right">
         <v-radio-group v-model="filterType" :value="'Tout'">
           <div style="display: flex; flex-direction: row; justify-content: space-between;">
             <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Tout" label="Tout"></v-radio>
             <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Achat" label="Achat"></v-radio>
             <v-radio value="Vente" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Vente"></v-radio>
+            <v-radio value="Dividendes" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Dividendes"></v-radio>
           </div>
         </v-radio-group>
       </v-col>
+
     </v-row>
-    <v-data-table :key="tableKey" ref="myTable" height="500" fixed-header :headers="HistoryTableHeaders"
-      :items="filteredTransactions" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
+    <v-data-table :key="tableKey" ref="myTable" height="500" fixed-header :headers="dynamicTableHeaders"
+      :items="dynamicFilter" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
       :item-value="(filteredTransactions) => `${filteredTransactions.id}`" show-select>
       <template v-slot:item.type="{ item }">
         <div v-bind:style="item.value.type === 'Achat' ? 'background-color: rgb(113,221,55); color:black; ' : 'background-color: rgb(255,62,29);  '
@@ -62,13 +64,13 @@
 
   <div class="d-flex justify-content-between">
     <div class="text-left total-net">
-      <div >CUMP Achat: <v-text-field readonly :value="weightedAchat"> </v-text-field></div>
+      <div>CUMP Achat: <v-text-field readonly :value="weightedAchat"> </v-text-field></div>
     </div>
     <div class="text-left total-net">
       <div>CUMP Vente: <v-text-field readonly :value="weightedVente"></v-text-field></div>
     </div>
   </div>
-  
+
   <div class="d-flex justify-content-between">
     <div class="text-left total-net">
       <div>Total Actions Achat: <v-text-field readonly :value="totalQuantityAchat"> </v-text-field></div>
@@ -84,11 +86,12 @@
     </div>
 
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
-      <span>Total Net: <v-text-field readonly  :value="formattedTotalNet"></v-text-field></span>
+      <span>Total Net: <v-text-field readonly :value="formattedTotalNet"></v-text-field></span>
+    </div>
+    <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetDividendes < 0 }">
+      <span>Total Net: <v-text-field readonly :value="totalNetDividendes"></v-text-field></span>
     </div>
   </div>
-
-
 </template>
 
 <script>
@@ -98,12 +101,15 @@ export default {
   data() {
     return {
       transactions: [],
+      sharesTransactions: [],
+      sharesTransactionsFiltred: [],
       selectedStock: null,
       search: '',
       filterType: 'Tout',
       totalNet: 0,
       selected: [],
       tableKey: 0,
+      isAlternateHeader: false,
       HistoryTableHeaders: [
         {
           title: 'Date',
@@ -153,13 +159,75 @@ export default {
           title: '',
           key: 'delete'
         }
+      ],
+      DividendesHeaders: [
+        {
+          title: 'Engagement',
+          key: 'date_engagement'
+        },
+        {
+          title: 'Détechement',
+          key: 'date_detachement'
+        },
+        {
+          title: 'Valeur',
+          key: 'value'
+        },
+        {
+          title: 'Quantité',
+          key: 'quantity'
+        },
+        {
+          title: 'Cours',
+          key: 'price'
+        },
+        {
+          title: 'Brut',
+          key: 'total'
+        },
+        {
+          title: 'Commission',
+          key: 'tax'
+        },
+        {
+          title: 'Net',
+          key: 'totalcom'
+        },
+        {
+          title: 'Banque',
+          key: 'bank'
+        },
+        {
+          title: '',
+          key: 'save'
+        },
+        {
+          title: '',
+          key: 'edit'
+        },
+        {
+          title: '',
+          key: 'delete'
+        }
       ]
     }
   },
   created() {
+    this.fetchSharesTransactions()
     this.fetchTransactions()
   },
+
   computed: {
+
+    dynamicTableHeaders() {
+      if (this.isAlternateHeader) {
+        return this.DividendesHeaders;
+      } else {
+        return this.HistoryTableHeaders;
+      }
+    },
+
+
     formattedTotalNetAchat() {
       // Format the totalNetAchat value using the formatCurrency() method
       return this.formatCurrency(this.totalNetAchat);
@@ -172,20 +240,42 @@ export default {
       // Format the totalNetAchat value using the formatCurrency() method
       return this.formatCurrency(this.totalNetVente);
     },
+    dynamicFilter() {
+      if (this.isAlternateHeader) {
+        return this.filteredSharesTransactions
+      }
+      else {
+        return this.filteredTransactions
+      }
+    },
+
+    filteredSharesTransactions() {
+      if (!this.selectedStock && !this.search && this.filterType == 'Dividendes') {
+        return this.sharesTransactions;
+      }
+
+      // return this.sharesTransactions.filter((transaction) => {
+      //   return true;
+      // }
+    },
+
     filteredTransactions() {
       if (!this.selectedStock && !this.search && !this.filterType) {
         return this.transactions
       }
+      console.log(this.sharesTransactions)
 
       return this.transactions.filter((transaction) => {
         if (
           this.filterType &&
           this.filterType !== 'Tout' &&
+          this.filterType !== 'Dividendes' &&
           !transaction.type.toLowerCase().includes(this.filterType.toLowerCase())
         ) {
+          this.isAlternateHeader = false;
+
           return false
         }
-
         if (
           this.selectedStock &&
           !transaction.value.toLowerCase().includes(this.selectedStock.toLowerCase())
@@ -196,7 +286,17 @@ export default {
         if (this.search && !transaction.value.toLowerCase().includes(this.search.toLowerCase())) {
           return false
         }
+        if (this.filterType == 'Dividendes') {
+          this.isAlternateHeader = true;
 
+        }
+        if (
+          this.filterType &&
+          this.filterType == 'Tout') {
+          this.isAlternateHeader = false;
+
+          return true
+        }
         return true
       })
     },
@@ -225,10 +325,9 @@ export default {
 
           totalWeightedPrice += priceVente * quantityVente;
           totalQuantity += quantityVente;
-          console.log(totalWeightedPrice)
-          console.log(totalQuantity)
+
         }
-      return (totalWeightedPrice / totalQuantity).toFixed(2);
+        return (totalWeightedPrice / totalQuantity).toFixed(2);
 
 
       }, 0)
@@ -259,10 +358,9 @@ export default {
 
           totalWeightedPrice += priceVente * quantityVente;
           totalQuantity += quantityVente;
-          console.log(totalWeightedPrice)
-          console.log(totalQuantity)
+
         }
-      return (totalWeightedPrice / totalQuantity).toFixed(2);
+        return (totalWeightedPrice / totalQuantity).toFixed(2);
 
 
       }, 0)
@@ -332,6 +430,27 @@ export default {
       }, 0)
       return total.toFixed(2)
     },
+    totalNetDividendes() {
+        
+      try {
+        var total = 0;
+        this.sharesTransactionsFiltred.forEach(share => {
+          const amount = parseFloat(share.totalcom)
+          console.log(amount);
+          total = total + amount
+
+        });
+
+
+        return total.toFixed(2)
+
+      }
+      catch (error) {
+        return 0;
+      }
+
+    },
+
     totalNetTVA() {
       const totalAchat = this.totalNetAchat
       const totalVente = this.totalNetVente
@@ -341,6 +460,7 @@ export default {
         return revenue // Apply currency formatting
       } else {
         const revenuetva = (totalVente - totalAchat) * 0.15
+
         const revenue = totalVente - totalAchat - revenuetva
         return revenue // Apply currency formatting
       }
@@ -427,8 +547,17 @@ export default {
   },
 
   methods: {
+    onShareSelected() {
+      // Call the function when the selected share value changes
+      if (this.selectedStock) {
+        this.fetchFiltredSharesTransactions(this.selectedStock);
+        console.log('eee')
+      }
+      console.log('eee')
+
+    },
     rowClass(item) {
-      console.log(item.type.toLowerCase())
+
 
       if (item.type.toLowerCase() === 'achat') {
         return 'row-green'
@@ -439,13 +568,12 @@ export default {
     },
     dynamicStyles(transaction) {
       if (transaction.type.toLowerCase() === 'achat') {
-        console.log(transaction.type + 'achat')
+
         return {
           backgroundColor: 'red !important',
           color: 'white'
         }
       } else {
-        console.log(transaction.type + 'vente')
 
         return {
           backgroundColor: 'blue',
@@ -477,7 +605,14 @@ export default {
     async deleteItem(item) {
       const transactionId = item.value.id // Assuming the ID of the item is stored in the 'id' property
       try {
-        await HistoryTransactionsService.deleteTransaction(transactionId)
+        if (item.value.type == "div") {
+          await HistoryTransactionsService.deleteShareTransaction(transactionId)
+
+        }
+        else {
+          await HistoryTransactionsService.deleteTransaction(transactionId)
+
+        }
         this.$emit('tableDeleteRow')
       } catch (error) {
         console.error(error)
@@ -500,9 +635,31 @@ export default {
         console.error(error)
       }
     },
+    async fetchSharesTransactions() {
+      try {
+        const response = await HistoryTransactionsService.reqShares()
+        this.sharesTransactions = response.data
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    async fetchFiltredSharesTransactions(shareName) {
+      try {
+        const response = await HistoryTransactionsService.reqShares();
+        const allSharesTransactions = response.data;
+
+        // Filter shares with the specific name
+        this.sharesTransactionsFiltred = allSharesTransactions.filter((share) => share.value === shareName);
 
 
-
+        if (this.sharesTransactionsFiltred.length === 0) {
+          console.warn(`No shares found with the name "${shareName}".`);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
   }
 }

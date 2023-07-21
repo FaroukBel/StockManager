@@ -1,6 +1,7 @@
 const AuthenticationController = require('./controllers/AuthentificationController') 
 const HistoryTransctionController = require('./controllers/HistoryTransctionController') 
 const TransactionController = require('./controllers/TransactionController') 
+const HistorySharesController = require('./controllers/HistorySharesController')
 
 module.exports = (app) => {
     app.post('/register',
@@ -30,7 +31,15 @@ module.exports = (app) => {
      HistoryTransctionController.deleteTransaction),
 
     app.delete('/delete-transaction', 
-    TransactionController.deleteAllTransactions)
+    TransactionController.deleteAllTransactions),
+
+    app.post('/history-share-transaction', 
+    HistorySharesController.storeShareTransaction),
+
+    app.get('/history-get-share-transaction', 
+    HistorySharesController.getShareTransactions)
+    app.delete('/history-delete-share-transaction/:transactionId', 
+    HistorySharesController.deleteShareTransaction)
     
 }
  

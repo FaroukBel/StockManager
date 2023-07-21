@@ -13,10 +13,10 @@
         <template v-for="(row, index) in rows" :key="index">
           <v-row>
             <v-col cols="6">
-              <v-text-field :label="`Prix d'achat ${index + 1}`" v-model="row.buyPrice"></v-text-field>
+              <v-text-field :label="`Prix d'achat ${index + 1}`" type="number" v-model="row.buyPrice"></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field :label="`Quantité ${index + 1}`" v-model="row.quantity"></v-text-field>
+              <v-text-field :label="`Quantité ${index + 1}`" type="number" v-model="row.quantity"></v-text-field>
             </v-col>
           </v-row>
         </template>
@@ -92,11 +92,10 @@ export default {
     },
     getFirstInputs() {
       const firstInputs = this.rows.map(row => row.buyPrice);
-      console.log('First Inputs:', firstInputs);
+ 
     },
     getSecondInputs() {
       const secondInputs = this.rows.map(row => row.quantity);
-      console.log('Second Inputs:', secondInputs);
     }
   }
 };
