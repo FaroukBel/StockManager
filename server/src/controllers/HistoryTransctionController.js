@@ -3,6 +3,7 @@ const { HistoryTransaction } = require('../models');
 const getTransactions = async (req, res) => {
   try {
     const transactions = await HistoryTransaction.findAll();
+    console.log(transactions)
     res.json(transactions);
   } catch (error) {
     console.error(error);

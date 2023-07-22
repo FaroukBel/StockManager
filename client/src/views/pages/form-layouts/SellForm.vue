@@ -17,7 +17,7 @@
         </VCol>
 
         <VCol cols="12" md="6">
-        <v-text-field  v-model="transaction.date" type="datetime-local"></v-text-field>
+        <v-text-field  v-model="transaction.date" :value="this.getCurrentDateTime()" type="datetime-local"></v-text-field>
       </VCol>
 
 
@@ -145,7 +145,7 @@ export default {
     return {
       
       transaction: {
-        date: formattedDate,
+        date: this.getCurrentDateTime(),
         stock: '',
         type: 'Vente',
         quantity: '',
@@ -253,6 +253,18 @@ export default {
  
   },
   methods: {
+    getCurrentDateTime() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate() ).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      
+      // Format the date to be compatible with datetime-local input
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    },
+    
     calculateTotal() {
       const quantity = parseFloat(this.transaction.quantity);
       const sellprice = parseFloat(this.transaction.sellprice);

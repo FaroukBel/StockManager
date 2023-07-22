@@ -1,3 +1,16 @@
+
+<script setup>
+
+const currentDate = new Date();
+const formattedDate = currentDate.toLocaleString('en-GB', {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+</script>
+
 <template>
   <VForm ref="myForm" @submit.prevent>
     <VRow>
@@ -84,8 +97,8 @@ export default {
   data() {
     return {
       transaction: {
-        date_engagement: formattedDate,
-        date_detachement: formattedDate,
+        date_engagement: this.getCurrentDateTime(0),
+        date_detachement: this.getCurrentDateTime(1),
         stock: '',
         quantity: '',
         buyprice: '',
@@ -170,6 +183,10 @@ export default {
         "Zellidja S.A"], // Static list of dropdown options
     };
   },
+  mounted(){
+    this.transaction.date_engagement = this.getCurrentDateTime(0);
+    this.transaction.date_detachement = this.getCurrentDateTime(1);
+  },
   watch: {
     'transaction.quantity': {
       handler(newValue) {
@@ -193,6 +210,17 @@ export default {
 
   },
   methods: {
+    getCurrentDateTime(step) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate() + step).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      
+      // Format the date to be compatible with datetime-local input
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    },
     handleDataUpdate(data) {
       this.dataFromTransactionForm = data;
     },
@@ -235,7 +263,7 @@ export default {
           this.transaction.total = '';
           this.transaction.tax = '';
           
-          this.$emit('buyTransactionAdded');
+          this.$emit('addShareTransaction');
           alert('Transaction enregistrée avec succés!');
         })
         .catch((error) => {

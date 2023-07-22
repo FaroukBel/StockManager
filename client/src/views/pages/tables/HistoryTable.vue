@@ -2,8 +2,8 @@
   <div style="padding: 20px;">
     <v-row class="d-flex">
       <v-col cols="3">
-        <v-select clearable v-model="selectedStock"  v-on:change="this.onShareSelected"  :items="stockOptions" label="Sélectionner une valeur"
-          :style="{ color: 'rgb(73, 249, 3) !important' }" outlined></v-select>
+        <v-select clearable v-model="selectedStock" v-on:change="this.onShareSelected" :items="stockOptions"
+          label="Sélectionner une valeur" :style="{ color: 'rgb(73, 249, 3) !important' }" outlined></v-select>
       </v-col>
 
       <v-col cols="3">
@@ -30,10 +30,11 @@
     <v-data-table :key="tableKey" ref="myTable" height="500" fixed-header :headers="dynamicTableHeaders"
       :items="dynamicFilter" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
       :item-value="(filteredTransactions) => `${filteredTransactions.id}`" show-select>
+
       <template v-slot:item.type="{ item }">
-        <div v-bind:style="item.value.type === 'Achat' ? 'background-color: rgb(113,221,55); color:black; ' : 'background-color: rgb(255,62,29);  '
+        <div class="d-flex " v-bind:style="item.value.type === 'Achat' ? 'background-color: #C4FF9B; height:70%; justify-content: center; align-items:center; color:black;' : 'height:70%; justify-content: center; align-items:center; color:black; height:70%;  background-color: #FF9B9B;  '
           ">
-          <p>{{ item.value.type }}</p>
+          <p style="margin: 0;">{{ item.value.type }}</p>
         </div>
       </template>
 
@@ -85,11 +86,16 @@
       <div>Total Net Vente: <v-text-field readonly :value="formattedTotalNetVente"></v-text-field></div>
     </div>
 
+    <!-- Assuming you have access to totalNetTVA and totalNetDividendes variables -->
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
       <span>Total Net: <v-text-field readonly :value="formattedTotalNet"></v-text-field></span>
     </div>
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetDividendes < 0 }">
-      <span>Total Net: <v-text-field readonly :value="totalNetDividendes"></v-text-field></span>
+      <span>Total Dividendes: <v-text-field readonly :value="totalNetDividendes"></v-text-field></span>
+    </div>
+    <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalDiviNet < 0 }">
+      <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
+      <span>Total: <v-text-field readonly :value="computedTotalDiviNet"></v-text-field></span>
     </div>
   </div>
 </template>
@@ -102,7 +108,7 @@ export default {
     return {
       transactions: [],
       sharesTransactions: [],
-      sharesTransactionsFiltred: [],
+      totalDiviNet: this.totalNetDividendes + this.totalNetTVA,
       selectedStock: null,
       search: '',
       filterType: 'Tout',
@@ -218,7 +224,20 @@ export default {
   },
 
   computed: {
+    computedTotalDiviNet() {
+      const totalNetTVAValue = this.totalNetTVA; // Call the totalNetTVA function to get its value
+      const totalNetDividendesValue = this.totalNetDividendes;
 
+      // Calculate the sum of totalNetTVA and totalNetDividendes
+      const total = parseFloat(totalNetTVAValue) + parseFloat(totalNetDividendesValue);
+
+      // Optional: If you want to apply currency formatting, you can do it here
+      // For example, if you are using toFixed(2) to display the result with two decimal places:
+      // const formattedTotal = total.toFixed(2);
+      // return formattedTotal;
+
+      return total;
+    },
     dynamicTableHeaders() {
       if (this.isAlternateHeader) {
         return this.DividendesHeaders;
@@ -251,19 +270,35 @@ export default {
 
     filteredSharesTransactions() {
       if (!this.selectedStock && !this.search && this.filterType == 'Dividendes') {
+
         return this.sharesTransactions;
+
       }
 
-      // return this.sharesTransactions.filter((transaction) => {
-      //   return true;
-      // }
+      return this.sharesTransactions.filter((transaction) => {
+
+        if (
+          this.selectedStock &&
+          !transaction.value.toLowerCase().includes(this.selectedStock.toLowerCase())
+        ) {
+          return false
+        }
+
+        if (this.search && !transaction.value.toLowerCase().includes(this.search.toLowerCase())) {
+          return false
+        }
+
+        return true
+      })
+
+
     },
 
     filteredTransactions() {
       if (!this.selectedStock && !this.search && !this.filterType) {
         return this.transactions
       }
-      console.log(this.sharesTransactions)
+
 
       return this.transactions.filter((transaction) => {
         if (
@@ -430,25 +465,18 @@ export default {
       }, 0)
       return total.toFixed(2)
     },
+
     totalNetDividendes() {
-        
-      try {
-        var total = 0;
-        this.sharesTransactionsFiltred.forEach(share => {
-          const amount = parseFloat(share.totalcom)
-          console.log(amount);
-          total = total + amount
+      const totalColumnIndex = this.DividendesHeaders.findIndex(
+        (header) => header.key === 'totalcom'
+      )
+      if (totalColumnIndex === -1) return 0
 
-        });
-
-
-        return total.toFixed(2)
-
-      }
-      catch (error) {
-        return 0;
-      }
-
+      return this.filteredSharesTransactions.reduce((total, transaction) => {
+        const amount = parseFloat(transaction[this.DividendesHeaders[totalColumnIndex].key])
+        return total + amount
+      }, 0)
+      return total.toFixed(2)
     },
 
     totalNetTVA() {
@@ -551,9 +579,8 @@ export default {
       // Call the function when the selected share value changes
       if (this.selectedStock) {
         this.fetchFiltredSharesTransactions(this.selectedStock);
-        console.log('eee')
+
       }
-      console.log('eee')
 
     },
     rowClass(item) {
@@ -639,27 +666,13 @@ export default {
       try {
         const response = await HistoryTransactionsService.reqShares()
         this.sharesTransactions = response.data
+
       } catch (error) {
         console.error(error)
       }
     },
 
-    async fetchFiltredSharesTransactions(shareName) {
-      try {
-        const response = await HistoryTransactionsService.reqShares();
-        const allSharesTransactions = response.data;
 
-        // Filter shares with the specific name
-        this.sharesTransactionsFiltred = allSharesTransactions.filter((share) => share.value === shareName);
-
-
-        if (this.sharesTransactionsFiltred.length === 0) {
-          console.warn(`No shares found with the name "${shareName}".`);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
 
   }
 }
@@ -690,7 +703,6 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 }
 
 .total-net-tva {
-
   color: rgb(19, 255, 19);
 }
 

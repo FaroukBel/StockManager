@@ -57,7 +57,7 @@ import wallet from '@images/cards/wallet-info.png'
     >
     <VCardText>
 
-      <Shares />
+      <Shares  @addShareTransaction="updateTable"/>
     </VCardText>
 
   </VCard>

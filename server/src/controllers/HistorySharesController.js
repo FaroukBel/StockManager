@@ -3,6 +3,8 @@ const { HistoryShares } = require('../models');
 const getShareTransactions = async (req, res) => {
   try {
     const sharesTransactions = await HistoryShares.findAll();
+    console.log(sharesTransactions)
+
     res.json(sharesTransactions);
   } catch (error) {
     console.error(error);
