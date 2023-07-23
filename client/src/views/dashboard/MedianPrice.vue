@@ -4,41 +4,45 @@
     <v-card-title>
       <div class="d-flex align-center justify-space-between">
         <div>CUMP</div>
-        <v-btn color="primary mt-1" @click="addRow">Ajouter</v-btn>
+        <div>
+          <v-btn color="primary mt-1" @click="addRow">Ajouter</v-btn>
+        <v-btn color="error mt-1" class="  ml-2" @click="deleteAllRows">Vider</v-btn>
+        </div>
+       
+
       </div>
     </v-card-title>
 
     <v-card-text style="max-height: 480px; overflow-y: auto;">
-      <v-list class="card-list py-5" >
+      <v-list class="card-list py-5">
         <template v-for="(row, index) in rows" :key="index">
           <v-row>
-            <v-col cols="6">
+            <v-col cols="5">
               <v-text-field :label="`Prix d'achat ${index + 1}`" type="number" v-model="row.buyPrice"></v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="5">
               <v-text-field :label="`Quantité ${index + 1}`" type="number" v-model="row.quantity"></v-text-field>
+              
             </v-col>
+            <v-col>
+              <v-btn icon color="error" @click="deleteRow(index)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-col>
+          
           </v-row>
         </template>
       </v-list>
     </v-card-text>
 
     <v-card-actions>
-      <div class="d-flex justify-space-around w-100" >
-    
+      <div class="d-flex justify-space-around w-100">
+
         <div class="w-100">
-          <v-text-field
-            label="Total quantité"
-            v-model="totalSecondInputs"
-            readonly
-          ></v-text-field>
+          <v-text-field label="Total quantité" v-model="totalSecondInputs" readonly></v-text-field>
         </div>
         <div class="w-100">
-          <v-text-field
-            label="CUMP"
-            v-model="weightedAveragePrice"
-            readonly
-          ></v-text-field>
+          <v-text-field label="CUMP" v-model="weightedAveragePrice" readonly></v-text-field>
         </div>
       </div>
     </v-card-actions>
@@ -83,6 +87,13 @@ export default {
     }
   },
   methods: {
+    deleteAllRows() {
+      this.rows = [];
+    },
+
+    deleteRow(index) {
+      this.rows.splice(index, 1);
+    },
     addRow() {
       const index = this.rows.length;
       this.rows.push({
@@ -92,7 +103,7 @@ export default {
     },
     getFirstInputs() {
       const firstInputs = this.rows.map(row => row.buyPrice);
- 
+
     },
     getSecondInputs() {
       const secondInputs = this.rows.map(row => row.quantity);

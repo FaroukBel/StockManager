@@ -70,14 +70,11 @@
     <div class="text-left total-net">
       <div>CUMP Vente: <v-text-field readonly :value="weightedVente"></v-text-field></div>
     </div>
-  </div>
-
-  <div class="d-flex justify-content-between">
     <div class="text-left total-net">
-      <div>Total Actions Achat: <v-text-field readonly :value="totalQuantityAchat"> </v-text-field></div>
+      <div>Total Actions Achat: <v-text-field readonly :value="formattedAchat"> </v-text-field></div>
     </div>
     <div class="text-left total-net">
-      <div>Total Actions Vente: <v-text-field readonly :value="totalQuantityVente"></v-text-field></div>
+      <div>Total Actions Vente: <v-text-field readonly :value="formattedVente"></v-text-field></div>
     </div>
     <div class="text-left total-net">
       <div>Total Net Achat: <v-text-field readonly :value="formattedTotalNetAchat"></v-text-field></div>
@@ -85,17 +82,21 @@
     <div class="text-left total-net">
       <div>Total Net Vente: <v-text-field readonly :value="formattedTotalNetVente"></v-text-field></div>
     </div>
+  </div>
+
+  <div class="d-flex justify-content-between">
+
 
     <!-- Assuming you have access to totalNetTVA and totalNetDividendes variables -->
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
       <span>Total Net: <v-text-field readonly :value="formattedTotalNet"></v-text-field></span>
     </div>
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetDividendes < 0 }">
-      <span>Total Dividendes: <v-text-field readonly :value="totalNetDividendes"></v-text-field></span>
+      <span>Total Dividendes: <v-text-field readonly :value="formattedTotalDivi"></v-text-field></span>
     </div>
-    <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalDiviNet < 0 }">
+    <div class="text-left total-net total-net-tva" :class="{ 'negative-value': computedTotalDiviNet < 0 }">
       <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
-      <span>Total: <v-text-field readonly :value="computedTotalDiviNet"></v-text-field></span>
+      <span>Total: <v-text-field readonly :value="formattedComputedTotal"></v-text-field></span>
     </div>
   </div>
 </template>
@@ -225,17 +226,9 @@ export default {
 
   computed: {
     computedTotalDiviNet() {
-      const totalNetTVAValue = this.totalNetTVA; // Call the totalNetTVA function to get its value
+      const totalNetTVAValue = this.totalNetTVA;
       const totalNetDividendesValue = this.totalNetDividendes;
-
-      // Calculate the sum of totalNetTVA and totalNetDividendes
       const total = parseFloat(totalNetTVAValue) + parseFloat(totalNetDividendesValue);
-
-      // Optional: If you want to apply currency formatting, you can do it here
-      // For example, if you are using toFixed(2) to display the result with two decimal places:
-      // const formattedTotal = total.toFixed(2);
-      // return formattedTotal;
-
       return total;
     },
     dynamicTableHeaders() {
@@ -245,18 +238,25 @@ export default {
         return this.HistoryTableHeaders;
       }
     },
-
-
+    formattedTotalDivi() {
+      return this.formatCurrency(this.totalNetDividendes);
+    },
+    formattedComputedTotal() {
+      return this.formatCurrency(this.computedTotalDiviNet);
+    },
+    formattedVente() {
+      return this.formatCurrency(this.totalQuantityVente);
+    },
+    formattedAchat() {
+      return this.formatCurrency(this.totalQuantityAchat);
+    },
     formattedTotalNetAchat() {
-      // Format the totalNetAchat value using the formatCurrency() method
       return this.formatCurrency(this.totalNetAchat);
     },
     formattedTotalNet() {
-      // Format the totalNetAchat value using the formatCurrency() method
       return this.formatCurrency(this.totalNetTVA);
     },
     formattedTotalNetVente() {
-      // Format the totalNetAchat value using the formatCurrency() method
       return this.formatCurrency(this.totalNetVente);
     },
     dynamicFilter() {
@@ -490,8 +490,9 @@ export default {
         const revenuetva = (totalVente - totalAchat) * 0.15
 
         const revenue = totalVente - totalAchat - revenuetva
-        return revenue // Apply currency formatting
+        return revenue.toFixed(2) // Apply currency formatting
       }
+
     },
 
     stockOptions() {
@@ -583,16 +584,7 @@ export default {
       }
 
     },
-    rowClass(item) {
 
-
-      if (item.type.toLowerCase() === 'achat') {
-        return 'row-green'
-      } else if (item.type.toLowerCase() === 'vente') {
-        return 'row-red'
-      }
-      return ''
-    },
     dynamicStyles(transaction) {
       if (transaction.type.toLowerCase() === 'achat') {
 
