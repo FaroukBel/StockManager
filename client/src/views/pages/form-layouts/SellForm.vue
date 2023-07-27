@@ -17,7 +17,7 @@
         </VCol>
 
         <VCol cols="12" md="6">
-        <v-text-field  v-model="transaction.date" :value="this.getCurrentDateTime()" type="datetime-local"></v-text-field>
+        <v-text-field  v-model="transaction.date" :value="transaction.date" type="datetime-local"></v-text-field>
       </VCol>
 
 
@@ -129,6 +129,7 @@
 </template>
 
 <script>
+import alerts from "sweetalert";
 import HistoryTransactionsService from '@/services/HistoryTransactionsService';
 import { router } from '@/router';
 const currentDate = new Date();
@@ -299,7 +300,7 @@ export default {
     !this.transaction.totalcom
   ) 
   {
-    alert('Veuillez remplir les champs obligatoires.');
+    swal('Important','Veuillez remplir les champs obligatoires.', 'info');
     return;
   }
 
@@ -313,11 +314,12 @@ export default {
           this.transaction.tax='';
 
           this.$emit('sellTransactionAdded');
-          alert('Transaction enregistrée avec succés!');
+          swal('Succès !','Transaction enregistrée avec succès!', 'success');
+
         })
         .catch((error) => {
           console.error(error);
-          alert('Failed to save transaction.');
+          swal('Erreur','Failed to save transaction.', 'error');
         });
     },
     async clearForm() {

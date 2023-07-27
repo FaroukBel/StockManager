@@ -85,7 +85,10 @@
   </div>
 
   <div class="d-flex justify-content-between">
-
+    <div class="text-left total-net ">
+      <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
+      <span>Total Commission: <v-text-field readonly :value="formattedTotalCommission"></v-text-field></span>
+    </div>
 
     <!-- Assuming you have access to totalNetTVA and totalNetDividendes variables -->
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
@@ -98,6 +101,7 @@
       <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
       <span>Total: <v-text-field readonly :value="formattedComputedTotal"></v-text-field></span>
     </div>
+
   </div>
 </template>
 
@@ -258,6 +262,9 @@ export default {
     },
     formattedTotalNetVente() {
       return this.formatCurrency(this.totalNetVente);
+    },
+    formattedTotalCommission() {
+      return this.formatCurrency(this.totalCommision);
     },
     dynamicFilter() {
       if (this.isAlternateHeader) {
@@ -478,6 +485,18 @@ export default {
       }, 0)
       return total.toFixed(2)
     },
+    totalCommision() {
+      const totalColumnIndex = this.HistoryTableHeaders.findIndex(
+        (header) => header.key === 'tax'
+      )
+      if (totalColumnIndex === -1) return 0
+
+      return this.filteredTransactions.reduce((total, transaction) => {
+        const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
+        return total + amount
+      }, 0)
+      return total.toFixed(2)
+    },
 
     totalNetTVA() {
       const totalAchat = this.totalNetAchat
@@ -690,12 +709,24 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
   margin-left: 20px;
 }
 
-.negative-value {
-  color: red !important;
+.total-net-tva input#input-125,
+.total-net-tva input#input-121,
+.total-net-tva input#input-123 {
+  color: rgb(19, 255, 19) !important;
 }
 
 .total-net-tva {
-  color: rgb(19, 255, 19);
+  color: rgb(19, 255, 19) !important;
+}
+
+.negative-value input#input-125,
+.negative-value input#input-121,
+.negative-value input#input-123 {
+  color: rgb(255, 79, 79) !important;
+}
+
+.negative-value {
+  color: red !important;
 }
 
 .no-border {

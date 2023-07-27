@@ -1,5 +1,14 @@
 {
+
+  "scripts": {
+    "client": "cd client && npm run dev",
+    "server": "cd server && npm start",
+    "dev": "concurrently \"npm run client\" \"npm run server\""
+  },
   "dependencies": {
     "vuetify-money": "^1.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
   }
 }
