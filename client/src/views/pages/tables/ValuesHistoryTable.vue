@@ -19,22 +19,21 @@
         <v-radio-group v-model="filterType" :value="'Tout'">
           <div style="display: flex; flex-direction: row; justify-content: space-between;">
             <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Tout" label="Tout"></v-radio>
-            <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Achat" label="Achat"></v-radio>
-            <v-radio value="Vente" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Vente"></v-radio>
-            <v-radio value="Dividendes" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Dividendes"></v-radio>
+            <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Achat" label="+Value"></v-radio>
+            <v-radio value="Vente" :style="{ color: 'rgb(73, 249, 3) !important' }" label="-Value"></v-radio>
           </div>
         </v-radio-group>
       </v-col>
 
     </v-row>
-    <v-data-table :key="tableKey" ref="myTable" height="500" fixed-header :headers="dynamicTableHeaders"
-      :items="dynamicFilter" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
+    <v-data-table :key="tableKey" ref="myTable" height="500" fixed-header :headers="HistoryTableHeaders"
+      :items="filteredTransactions" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
       :item-value="(filteredTransactions) => `${filteredTransactions.id}`" show-select>
 
-      <template v-slot:item.type="{ item }">
-        <div class="d-flex " v-bind:style="item.value.type === 'Achat' ? 'background-color: #C4FF9B; height:70%; justify-content: center; align-items:center; color:black;' : 'height:70%; justify-content: center; align-items:center; color:black; height:70%;  background-color: #FF9B9B;  '
+      <template v-slot:item.totalcom="{ item }">
+        <div class="d-flex " v-bind:style="item.value.totalcom > 0 ? 'background-color: #C4FF9B; height:70%;  color:black;' : 'height:70%; color:black; height:70%;  background-color: #FF9B9B;  '
           ">
-          <p style="margin: 0;">{{ item.value.type }}</p>
+          <p style="margin: 10px ;">{{ item.value.totalcom.toLocaleString('fr-MA', { style: 'currency', currency: 'MAD' })}}</p>
         </div>
       </template>
 
@@ -71,8 +70,6 @@ export default {
   data() {
     return {
       transactions: [],
-      sharesTransactions: [],
-      totalDiviNet: this.totalNetDividendes + this.totalNetTVA,
       selectedStock: null,
       search: '',
       filterType: 'Tout',
@@ -99,58 +96,28 @@ export default {
   },
 
   computed: {
-    computedTotalDiviNet() {
-      const totalNetTVAValue = this.totalNetTVA;
-      const totalNetDividendesValue = this.totalNetDividendes;
-      const total = parseFloat(totalNetTVAValue) + parseFloat(totalNetDividendesValue);
-      return total;
-    },
-    dynamicTableHeaders() {
-      if (this.isAlternateHeader) {
-        return this.DividendesHeaders;
-      } else {
-        return this.HistoryTableHeaders;
-      }
-    },
-    formattedTotalDivi() {
-      return this.formatCurrency(this.totalNetDividendes);
-    },
-    formattedComputedTotal() {
-      return this.formatCurrency(this.computedTotalDiviNet);
-    },
-    formattedVente() {
-      return this.formatCurrency(this.totalQuantityVente);
-    },
-    formattedAchat() {
-      return this.formatCurrency(this.totalQuantityAchat);
-    },
-    formattedTotalNetAchat() {
-      return this.formatCurrency(this.totalNetAchat);
-    },
-    formattedTotalNet() {
-      return this.formatCurrency(this.totalNetTVA);
-    },
-    formattedTotalNetVente() {
-      return this.formatCurrency(this.totalNetVente);
-    },
-    formattedTotalCommission() {
-      return this.formatCurrency(this.totalCommision);
-    },
-    dynamicFilter() {
-  
-        return this.filteredTransactions
-      
+   
+
+    formattedValue(value) {
+      return this.formatCurrency(value);
     },
 
-    filteredSharesTransactions() {
-      if (!this.selectedStock && !this.search && this.filterType == 'Dividendes') {
 
-        return this.sharesTransactions;
-
+    filteredTransactions() {
+      if (!this.selectedStock && !this.search && !this.filterType) {
+        return this.transactions
       }
 
-      return this.sharesTransactions.filter((transaction) => {
 
+      return this.transactions.filter((transaction) => {
+        if (
+          this.filterType &&
+          this.filterType !== 'Tout' &&
+          !transaction.type.toLowerCase().includes(this.filterType.toLowerCase())
+        ) {
+        
+          return false
+        }
         if (
           this.selectedStock &&
           !transaction.value.toLowerCase().includes(this.selectedStock.toLowerCase())
@@ -161,225 +128,22 @@ export default {
         if (this.search && !transaction.value.toLowerCase().includes(this.search.toLowerCase())) {
           return false
         }
+        if (this.filterType == 'Dividendes') {
+          this.isAlternateHeader = true;
 
+        }
+        if (
+          this.filterType &&
+          this.filterType == 'Tout') {
+          this.isAlternateHeader = false;
+
+          return true
+        }
         return true
       })
-
-
-    },
-
-    filteredTransactions() {
-      // if (!this.selectedStock && !this.search && !this.filterType) {
-        return this.transactions
-      // }
-
-
-      // return this.transactions.filter((transaction) => {
-      //   if (
-      //     this.filterType &&
-      //     this.filterType !== 'Tout' &&
-      //     this.filterType !== 'Dividendes' &&
-      //     !transaction.type.toLowerCase().includes(this.filterType.toLowerCase())
-      //   ) {
-      //     this.isAlternateHeader = false;
-
-      //     return false
-      //   }
-      //   if (
-      //     this.selectedStock &&
-      //     !transaction.value.toLowerCase().includes(this.selectedStock.toLowerCase())
-      //   ) {
-      //     return false
-      //   }
-
-      //   if (this.search && !transaction.value.toLowerCase().includes(this.search.toLowerCase())) {
-      //     return false
-      //   }
-      //   if (this.filterType == 'Dividendes') {
-      //     this.isAlternateHeader = true;
-
-      //   }
-      //   if (
-      //     this.filterType &&
-      //     this.filterType == 'Tout') {
-      //     this.isAlternateHeader = false;
-
-      //     return true
-      //   }
-      //   return true
-      // })
     },
 
 
-
-    weightedVente() {
-      const quantityVenteColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'quantity'
-      )
-      if (quantityVenteColumnIndex === -1) return 0
-
-      const priceVenteColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'price'
-      )
-      if (priceVenteColumnIndex === -1) return 0
-
-      let totalWeightedPrice = 0;
-
-      let totalQuantity = 0;
-
-      this.filteredTransactions.reduce((total, transaction) => {
-        if (transaction.type.toLowerCase() === 'vente') {
-          const quantityVente = parseFloat(transaction[this.HistoryTableHeaders[quantityVenteColumnIndex].key])
-          const priceVente = parseFloat(transaction[this.HistoryTableHeaders[priceVenteColumnIndex].key])
-
-          totalWeightedPrice += priceVente * quantityVente;
-          totalQuantity += quantityVente;
-
-        }
-        return (totalWeightedPrice / totalQuantity).toFixed(2);
-
-
-      }, 0)
-      return (totalWeightedPrice / totalQuantity).toFixed(2);
-
-    },
-
-
-    weightedAchat() {
-      const quantityVenteColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'quantity'
-      )
-      if (quantityVenteColumnIndex === -1) return 0
-
-      const priceVenteColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'price'
-      )
-      if (priceVenteColumnIndex === -1) return 0
-
-      let totalWeightedPrice = 0;
-
-      let totalQuantity = 0;
-
-      this.filteredTransactions.reduce((total, transaction) => {
-        if (transaction.type.toLowerCase() === 'achat') {
-          const quantityVente = parseFloat(transaction[this.HistoryTableHeaders[quantityVenteColumnIndex].key])
-          const priceVente = parseFloat(transaction[this.HistoryTableHeaders[priceVenteColumnIndex].key])
-
-          totalWeightedPrice += priceVente * quantityVente;
-          totalQuantity += quantityVente;
-
-        }
-        return (totalWeightedPrice / totalQuantity).toFixed(2);
-
-
-      }, 0)
-      return (totalWeightedPrice / totalQuantity).toFixed(2);
-
-    },
-    totalNetAchat() {
-      const totalColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'totalcom'
-      )
-      if (totalColumnIndex === -1) return 0
-
-      return this.filteredTransactions.reduce((total, transaction) => {
-        if (transaction.type.toLowerCase() === 'achat') {
-          const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
-          return total + amount
-        }
-        return total
-      }, 0)
-      return total.toFixed(2)
-    },
-
-    totalQuantityAchat() {
-      const totalColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'quantity'
-      )
-      if (totalColumnIndex === -1) return 0
-
-      return this.filteredTransactions.reduce((total, transaction) => {
-        if (transaction.type.toLowerCase() === 'achat') {
-          const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
-          return total + amount
-        }
-
-        return total
-      }, 0)
-      return total
-    },
-    totalQuantityVente() {
-      const totalColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'quantity'
-      )
-      if (totalColumnIndex === -1) return 0
-
-      return this.filteredTransactions.reduce((total, transaction) => {
-        if (transaction.type.toLowerCase() === 'vente') {
-          const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
-          return total + amount
-        }
-
-        return total
-      }, 0)
-      return total
-    },
-    totalNetVente() {
-      const totalColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'totalcom'
-      )
-      if (totalColumnIndex === -1) return 0
-
-      return this.filteredTransactions.reduce((total, transaction) => {
-        if (transaction.type.toLowerCase() === 'vente') {
-          const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
-          return total + amount
-        }
-        return total
-      }, 0)
-      return total.toFixed(2)
-    },
-
-    totalNetDividendes() {
-      const totalColumnIndex = this.DividendesHeaders.findIndex(
-        (header) => header.key === 'totalcom'
-      )
-      if (totalColumnIndex === -1) return 0
-
-      return this.filteredSharesTransactions.reduce((total, transaction) => {
-        const amount = parseFloat(transaction[this.DividendesHeaders[totalColumnIndex].key])
-        return total + amount
-      }, 0)
-      return total.toFixed(2)
-    },
-    totalCommision() {
-      const totalColumnIndex = this.HistoryTableHeaders.findIndex(
-        (header) => header.key === 'tax'
-      )
-      if (totalColumnIndex === -1) return 0
-
-      return this.filteredTransactions.reduce((total, transaction) => {
-        const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
-        return total + amount
-      }, 0)
-      return total.toFixed(2)
-    },
-
-    totalNetTVA() {
-      const totalAchat = this.totalNetAchat
-      const totalVente = this.totalNetVente
-
-      if (totalVente - totalAchat < 0) {
-        const revenue = (totalVente - totalAchat).toFixed(2)
-        return revenue // Apply currency formatting
-      } else {
-        const revenuetva = (totalVente - totalAchat) * 0.15
-
-        const revenue = totalVente - totalAchat - revenuetva
-        return revenue.toFixed(2) // Apply currency formatting
-      }
-
-    },
 
     stockOptions() {
       return [
@@ -532,49 +296,49 @@ export default {
       this.search = ''
     },
 
-    
+
 
     async fetchTransactions() {
-  try {
-    const response = await HistoryTransactionsService.index();
-    this.transactions = response.data;
+      try {
+        const response = await HistoryTransactionsService.index();
+        this.transactions = response.data;
 
-    // Calculate the buy and sell totals for each value
-    const nameTotals = {};
+        // Calculate the buy and sell totals for each value
+        const nameTotals = {};
 
-    this.transactions.forEach(transaction => {
-      const { value, type, totalcom } = transaction;
-      const totalcomValue = parseFloat(totalcom);
+        this.transactions.forEach(transaction => {
+          const { value, type, totalcom } = transaction;
+          const totalcomValue = parseFloat(totalcom);
 
-      if (!nameTotals[value]) {
-        nameTotals[value] = { value, buyTotal: 0, sellTotal: 0, totalcomTotal: 0 };
+          if (!nameTotals[value]) {
+            nameTotals[value] = { value, buyTotal: 0, sellTotal: 0, totalcomTotal: 0 };
+          }
+
+          if (type === "Achat") {
+            nameTotals[value].buyTotal += totalcomValue;
+          } else if (type === "Vente") {
+            nameTotals[value].sellTotal += totalcomValue;
+          }
+          const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
+          if (total > 0) {
+            const totalCom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) * 0.15;
+            nameTotals[value].totalcom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) - totalCom;
+          }
+          else {
+            nameTotals[value].totalcom = total;
+          }
+        });
+
+        // Now, nameTotals array contains the desired totals for each unique value
+        const nameTotalsArray = Object.values(nameTotals);
+
+        // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
+        this.transactions = nameTotalsArray;
+
+      } catch (error) {
+        console.error(error);
       }
-
-      if (type === "Achat") {
-        nameTotals[value].buyTotal += totalcomValue;
-      } else if (type === "Vente") {
-        nameTotals[value].sellTotal += totalcomValue;
-      }
-      const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
-      if(total>0){
-        const totalCom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) * 0.15;
-        nameTotals[value].totalcom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) - totalCom;
-      }
-      else{
-        nameTotals[value].totalcom = total;
-      }
-    });
-
-    // Now, nameTotals array contains the desired totals for each unique value
-    const nameTotalsArray = Object.values(nameTotals);
-
-    // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
-    this.transactions = nameTotalsArray;
-
-  } catch (error) {
-    console.error(error);
-  }
-}
+    }
 
 
 
