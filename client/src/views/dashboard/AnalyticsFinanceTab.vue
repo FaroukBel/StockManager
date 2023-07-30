@@ -5,8 +5,28 @@ import statsVerticalChart from '@images/cards/chart-success.png'
 import statsVerticalPaypal from '@images/cards/paypal-error.png'
 import statsVerticalWallet from '@images/cards/wallet-primary.png'
 import { hexToRgb } from '@layouts/utils'
-
+import HistoryTransactionsService from '@/services/HistoryTransactionsService';
 const vuetifyTheme = useTheme()
+
+
+
+const transactions = ref([]);
+
+async function fetchTransactions() {
+  try {
+    const response = await HistoryTransactionsService.index();
+    transactions.value = response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+onMounted(() => {
+  fetchTransactions();
+});
+
+console.log(transactions.value);
+
 
 const series = {
   income: [{

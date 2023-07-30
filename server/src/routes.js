@@ -28,7 +28,7 @@ module.exports = (app) => {
     TransactionController.storeTransaction),
 
     app.delete('/history-delete-transaction/:transactionId',
-     HistoryTransctionController.deleteTransaction),
+    HistoryTransctionController.deleteTransaction),
 
     app.delete('/delete-transaction', 
     TransactionController.deleteAllTransactions),
@@ -40,6 +40,5 @@ module.exports = (app) => {
     HistorySharesController.getShareTransactions)
     app.delete('/history-delete-share-transaction/:transactionId', 
     HistorySharesController.deleteShareTransaction)
-    
 }
  
