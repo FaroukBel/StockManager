@@ -43,7 +43,8 @@ async function fetchTransactions() {
 
         // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
         transactions.value = nameTotalsArray;
-        console.log(transactions.value)
+        
+        console.log(transactions.value[0].totalcom)
       } catch (error) {
         console.error(error);
       }
@@ -53,7 +54,7 @@ async function fetchTransactions() {
       fetchTransactions();
     })
 
-2
+
 const series = [
   10,
   60,

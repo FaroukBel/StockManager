@@ -19,8 +19,8 @@
         <v-radio-group v-model="filterType" :value="'Tout'">
           <div style="display: flex; flex-direction: row; justify-content: space-between;">
             <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Tout" label="Tout"></v-radio>
-            <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Achat" label="+Value"></v-radio>
-            <v-radio value="Vente" :style="{ color: 'rgb(73, 249, 3) !important' }" label="-Value"></v-radio>
+            <v-radio disabled :style="{ color: 'rgb(73, 249, 3) !important' }" value="Achat" label="+Value"></v-radio>
+            <v-radio disabled value="Vente" :style="{ color: 'rgb(73, 249, 3) !important' }" label="-Value"></v-radio>
           </div>
         </v-radio-group>
       </v-col>
@@ -33,7 +33,9 @@
       <template v-slot:item.totalcom="{ item }">
         <div class="d-flex " v-bind:style="item.value.totalcom > 0 ? 'background-color: #C4FF9B; height:70%;  color:black;' : 'height:70%; color:black; height:70%;  background-color: #FF9B9B;  '
           ">
-          <p style="margin: 10px ;">{{ item.value.totalcom.toLocaleString('fr-MA', { style: 'currency', currency: 'MAD' })}}</p>
+          <p style="margin: 10px ;">{{ item.value.totalcom.toLocaleString('fr-MA', {
+            style: 'currency', currency: 'MAD'
+          }) }}</p>
         </div>
       </template>
 
@@ -57,6 +59,17 @@
       </template>
     </v-data-table>
 
+    <div class="d-flex justify-content-between">
+
+      <div class="text-left total-net total-net-tva negative-value">
+        <span>Total -Value: <v-text-field readonly :value="calculateTotalNegValue('min')"></v-text-field></span>
+      </div>
+      <div class="text-left total-net total-net-tva">
+        <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
+        <span>Total +Value: <v-text-field readonly :value="calculateTotalNegValue('plus')"></v-text-field></span>
+      </div>
+
+    </div>
     <v-card class="mt-2 pa-2">
       <pre>{{ selected }}</pre>
     </v-card>
@@ -96,6 +109,7 @@ export default {
   },
 
   computed: {
+
    
 
     formattedValue(value) {
@@ -115,7 +129,7 @@ export default {
           this.filterType !== 'Tout' &&
           !transaction.type.toLowerCase().includes(this.filterType.toLowerCase())
         ) {
-        
+
           return false
         }
         if (
@@ -226,6 +240,38 @@ export default {
   },
 
   methods: {
+
+    formatCurrency(value) {
+      return value.toLocaleString('fr-MA', { style: 'currency', currency: 'MAD' })
+    },
+
+    calculateTotalNegValue(option) {
+      let plusValue = 0;
+      let minusValue = 0;
+
+      this.transactions.forEach(transaction => {
+          const { value, type, totalcom } = transaction;
+          const totalcomValue = parseFloat(totalcom);
+
+          if(totalcomValue > 0){
+            plusValue += totalcomValue;
+          }
+          else if(totalcomValue<0){
+            minusValue += totalcomValue;
+          }
+
+
+    })
+    if(option ==="min"){
+      return this.formatCurrency(minusValue);
+    }
+    else{
+      return this.formatCurrency(plusValue);
+
+    }
+    },
+
+
     onShareSelected() {
       // Call the function when the selected share value changes
       if (this.selectedStock) {
