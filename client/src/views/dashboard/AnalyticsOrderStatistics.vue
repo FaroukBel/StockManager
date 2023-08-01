@@ -2,13 +2,64 @@
 import VueApexCharts from 'vue3-apexcharts'
 import { useTheme } from 'vuetify'
 import { hexToRgb } from '@layouts/utils'
+import HistoryTransactionsService from '@/services/HistoryTransactionsService';
+const vuetifyTheme = useTheme();
 
-const vuetifyTheme = useTheme()
+const transactions = ref([]);
 
+async function fetchTransactions() {
+      try {
+        const response = await HistoryTransactionsService.index();
+        transactions.value = response.data;
+
+        // Calculate the buy and sell totals for each value
+        const nameTotals = {};
+
+        transactions.value.forEach(transaction => {
+          const { value, type, totalcom } = transaction;
+          const totalcomValue = parseFloat(totalcom);
+
+          if (!nameTotals[value]) {
+            nameTotals[value] = { value, buyTotal: 0, sellTotal: 0, totalcomTotal: 0 };
+          }
+
+          if (type === "Achat") {
+            nameTotals[value].buyTotal += totalcomValue;
+          } else if (type === "Vente") {
+            nameTotals[value].sellTotal += totalcomValue;
+          }
+          const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
+          if (total > 0) {
+            const totalCom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) * 0.15;
+            nameTotals[value].totalcom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) - totalCom;
+          }
+          else {
+            nameTotals[value].totalcom = total;
+          }
+        });
+
+        // Now, nameTotals array contains the desired totals for each unique value
+        const nameTotalsArray = Object.values(nameTotals);
+
+        // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
+        transactions.value = nameTotalsArray;
+        console.log(transactions.value)
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    onMounted(()=>{
+      fetchTransactions();
+    })
+
+2
 const series = [
-  20,
+  10,
   60,
-  1,
+  10,
+  20,
+  50,
   40,
 ]
 
@@ -31,10 +82,7 @@ const chartOptions = computed(() => {
     tooltip: { enabled: false },
     dataLabels: { enabled: false },
     labels: [
-      'Fashion',
-      'Electronic',
-      'Sports',
-      'Decor',
+      transactions.value
     ],
     colors: [
       currentTheme.success,

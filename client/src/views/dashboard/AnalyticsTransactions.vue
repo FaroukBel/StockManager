@@ -27,7 +27,7 @@
       </div>
     </v-card-title>
     
-    <v-card-text style="max-height: 380px; overflow-y: auto;">
+    <v-card-text style="max-height: 488px; overflow-y: auto;">
       <v-list class="card-list">
         <v-list-item v-for="transaction in transactions" :key="transaction.id">
 

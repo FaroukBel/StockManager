@@ -16,6 +16,8 @@ async function fetchTransactions() {
   try {
     const response = await HistoryTransactionsService.index();
     transactions.value = response.data;
+// console.log(transactions.value[0].totalcom);
+
   } catch (error) {
     console.error(error);
   }
@@ -25,7 +27,6 @@ onMounted(() => {
   fetchTransactions();
 });
 
-console.log(transactions.value);
 
 
 const series = {
