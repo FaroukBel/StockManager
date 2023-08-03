@@ -8,51 +8,41 @@ const vuetifyTheme = useTheme();
 const transactions = ref([]);
 
 async function fetchTransactions() {
-      try {
-        const response = await HistoryTransactionsService.index();
-        transactions.value = response.data;
+  try {
+    const response = await HistoryTransactionsService.index();
+    transactions.value = response.data;
 
-        // Calculate the buy and sell totals for each value
-        const nameTotals = {};
+    // Calculate the buy and sell totals for each value
+    const nameTotals = {};
 
-        transactions.value.forEach(transaction => {
-          const { value, type, totalcom } = transaction;
-          const totalcomValue = parseFloat(totalcom);
+    transactions.value.forEach(transaction => {
+      const { value, type, quantity } = transaction;
+      const totalcomValue = parseFloat(quantity);
 
-          if (!nameTotals[value]) {
-            nameTotals[value] = { value, buyTotal: 0, sellTotal: 0, totalcomTotal: 0 };
-          }
-
-          if (type === "Achat") {
-            nameTotals[value].buyTotal += totalcomValue;
-          } else if (type === "Vente") {
-            nameTotals[value].sellTotal += totalcomValue;
-          }
-          const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
-          if (total > 0) {
-            const totalCom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) * 0.15;
-            nameTotals[value].totalcom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) - totalCom;
-          }
-          else {
-            nameTotals[value].totalcom = total;
-          }
-        });
-
-        // Now, nameTotals array contains the desired totals for each unique value
-        const nameTotalsArray = Object.values(nameTotals);
-
-        // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
-        transactions.value = nameTotalsArray;
-        
-        console.log(transactions.value[0].totalcom)
-      } catch (error) {
-        console.error(error);
+      if (!nameTotals[value]) {
+        nameTotals[value] = { value, quantityTotal: 0 };
       }
-    }
+      if (type === "Achat")
+        nameTotals[value].quantityTotal += totalcomValue;
 
-    onMounted(()=>{
-      fetchTransactions();
-    })
+    });
+
+    // Now, nameTotals array contains the desired totals for each unique value
+    const nameTotalsArray = Object.values(nameTotals).map((quantity) => quantity);
+    console.log(nameTotalsArray)
+
+    // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
+    transactions.value = nameTotalsArray;
+
+    console.log()
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+onMounted(() => {
+  fetchTransactions();
+})
 
 
 const series = [
@@ -67,9 +57,9 @@ const series = [
 const chartOptions = computed(() => {
   const currentTheme = vuetifyTheme.current.value.colors
   const variableTheme = vuetifyTheme.current.value.variables
-  const disabledTextColor = `rgba(${ hexToRgb(String(currentTheme['on-surface'])) },${ variableTheme['disabled-opacity'] })`
-  const primaryTextColor = `rgba(${ hexToRgb(String(currentTheme['on-surface'])) },${ variableTheme['high-emphasis-opacity'] })`
-  
+  const disabledTextColor = `rgba(${hexToRgb(String(currentTheme['on-surface']))},${variableTheme['disabled-opacity']})`
+  const primaryTextColor = `rgba(${hexToRgb(String(currentTheme['on-surface']))},${variableTheme['high-emphasis-opacity']})`
+
   return {
     chart: {
       sparkline: { enabled: true },
@@ -207,27 +197,14 @@ const moreList = [
         </div>
 
         <div>
-          <VueApexCharts
-            type="donut"
-            :height="125"
-            width="105"
-            :options="chartOptions"
-            :series="series"
-          />
+          <VueApexCharts type="donut" :height="125" width="105" :options="chartOptions" :series="series" />
         </div>
       </div>
 
       <VList class="card-list mt-7">
-        <VListItem
-          v-for="order in orders"
-          :key="order.title"
-        >
+        <VListItem v-for="order in orders" :key="order.title">
           <template #prepend>
-            <VAvatar
-              rounded
-              variant="tonal"
-              :color="order.avatarColor"
-            >
+            <VAvatar rounded variant="tonal" :color="order.avatarColor">
               <VIcon :icon="order.avatarIcon" />
             </VAvatar>
           </template>
