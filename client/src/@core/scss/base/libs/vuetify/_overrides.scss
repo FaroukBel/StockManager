@@ -288,6 +288,10 @@ h6,
   }
 }
 
+.type-columns .v-text-field input{
+  color: rgb(0, 0, 0) !important;
+}
+
 .v-text-field input{
-  color: white !important;
+  color: rgb(255, 255, 255) !important;
 }

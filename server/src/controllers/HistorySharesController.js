@@ -3,7 +3,6 @@ const { HistoryShares } = require('../models');
 const getShareTransactions = async (req, res) => {
   try {
     const sharesTransactions = await HistoryShares.findAll();
-    console.log(sharesTransactions)
 
     res.json(sharesTransactions);
   } catch (error) {
@@ -16,7 +15,7 @@ const getShareTransactions = async (req, res) => {
 const storeShareTransaction = async (req, res) => {
   try {
     const { date_engagement, date_detachement, stock, quantity, buyprice, total, tax, totalcom } = req.body;
-    console.log(req.body)
+    
     const value = stock;
     const type = "div"
     const price = parseFloat(buyprice);

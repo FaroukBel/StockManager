@@ -9,7 +9,7 @@ module.exports = (app) => {
     app.post('/login',
     AuthenticationController.login),
 
-    app.post('/history-update/:transactionId',
+    app.put('/history-update/:transactionId',
     HistoryTransctionController.updateTransaction),
 
     app.get('/history-get-buy-transaction',

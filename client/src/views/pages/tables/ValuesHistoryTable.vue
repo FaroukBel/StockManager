@@ -26,7 +26,7 @@
       </v-col>
 
     </v-row>
-    <v-data-table :key="tableKey" ref="myTable" height="500" fixed-header :headers="HistoryTableHeaders"
+    <v-data-table :key="tableKey" hover ref="myTable" height="500" fixed-header :headers="HistoryTableHeaders"
       :items="filteredTransactions" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
       :item-value="(filteredTransactions) => `${filteredTransactions.id}`" show-select>
 

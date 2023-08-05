@@ -3,7 +3,7 @@ const { HistoryTransaction } = require('../models');
 const getTransactions = async (req, res) => {
   try {
     const transactions = await HistoryTransaction.findAll();
-    console.log(transactions)
+
     res.json(transactions);
   } catch (error) {
     console.error(error);
@@ -80,8 +80,9 @@ const deleteTransaction = async (req, res) => {
 const updateTransaction = async (req, res) => {
   try {
     const { transactionId } = req.params;
+    console.log(transactionId)
     const { date, stock, type, quantity, price, total, tax, totalcom, bank } = req.body;
-
+    console.log(date)
     const transaction = await HistoryTransaction.findByPk(transactionId);
     if (!transaction) {
       

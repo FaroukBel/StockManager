@@ -29,8 +29,8 @@ export default {
   deleteShareTransaction(transactionId) {
     return api().delete(`history-delete-share-transaction/${transactionId}`);
   },
-  updateTransaction(transactionId){
-    return api().post(`history-update/${transactionId}`);
+  updateTransaction(transactionId, transaction){
+    return api().put(`history-update/${transactionId}`, transaction);
 
   }
 

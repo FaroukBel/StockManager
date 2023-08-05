@@ -27,35 +27,53 @@
       </v-col>
 
     </v-row>
-    <v-data-table :key="tableKey" ref="myTable" height="500" fixed-header :headers="dynamicTableHeaders"
+    <v-data-table width="400" :key="tableKey" ref="myTable" height="500" fixed-header :headers="dynamicTableHeaders"
       :items="dynamicFilter" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
-      :item-value="(filteredTransactions) => `${filteredTransactions.id}`" show-select>
+      :item-value="(filteredTransactions) => `${filteredTransactions.id}`" hover>
 
       <template v-slot:item.type="{ item }">
-        <div class="d-flex " v-bind:style="item.value.type === 'Achat' ? 'background-color: #C4FF9B; height:70%; justify-content: center; align-items:center; color:black;' : 'height:70%; justify-content: center; align-items:center; color:black; height:70%;  background-color: #FF9B9B;  '
-          ">
-          <p style="margin: 0;">{{ item.value.type }}</p>
+        <div class="d-flex type-columns"
+          :style="item.value.type === 'Achat' ? ' background-color: #C4FF9B; height:70%; justify-content: center; align-items:center; color:black !important;' : 'height:70%; justify-content: center; align-items:center; color:black; height:70%;  background-color: #FF9B9B;  '">
+          <v-text-field  v-model="item.value.type" style="margin: 0;"></v-text-field>
         </div>
       </template>
+
 
       <template v-slot:item.save="{ item }">
         <v-btn :loading="item.loading" elevation="0" icon color="green" v-on:click="this.saveItem(item)">
           <v-icon dark>ri:save-2-line</v-icon>
         </v-btn>
       </template>
-      <template v-slot:item.edit="{ item }">
-        <v-btn :loading="item.loading" elevation="0" icon color="green" v-on:click="this.editItem(item)">
-          <v-icon dark>mdi-pencil</v-icon>
-        </v-btn>
-      </template>
+
+
       <template v-slot:item.delete="{ item }">
         <v-btn :loading="item.loading" elevation="0" icon color="red !important" v-on:click="this.deleteItem(item)">
           <v-icon dark>mdi-delete</v-icon>
         </v-btn></template>
+      <template v-slot:item.value="{ item }">
 
-      <template v-slot:item.bank="{ item }">
-        <v-text-field class="no-border"></v-text-field>
+        <v-select class="no-border-select" clearable v-model="item.value.value" :items="stockOptions"
+          :style="{ color: 'rgb(73, 249, 3) !important' }" outlined></v-select>
       </template>
+      <template v-slot:item.bank="{ item }">
+        <v-text-field class="no-border" v-model="item.value.bank"></v-text-field>
+      </template>
+
+      <template v-slot:item.quantity="{ item }">
+        <v-text-field v-model="item.value.quantity" type="number" class="no-border"></v-text-field>
+      </template>
+      <template v-slot:item.price="{ item }">
+        <v-text-field v-model="item.value.price" type="number" class="no-border"></v-text-field>
+      </template>
+      <template v-slot:item.bankDiff="{ item }">
+        <p class="no-border text-white">{{ (parseFloat(item.value.totalcom) - parseFloat(item.value.bank)).toFixed(2) }}
+        </p>
+      </template>
+      <template v-slot:item.date="{ item }">
+        <v-text-field v-model="item.value.date" :value="item.value.date" type="datetime-local"></v-text-field>
+
+      </template>
+
     </v-data-table>
 
     <v-card class="mt-2 pa-2">
@@ -121,26 +139,35 @@ export default {
       selected: [],
       tableKey: 0,
       isAlternateHeader: false,
+      editingColumn: null,
       HistoryTableHeaders: [
         {
           title: 'Date',
-          key: 'date'
+          key: 'date',
+          width: '200px'
         },
         {
           title: 'Valeur',
-          key: 'value'
+          key: 'value',
+          width: '270px'
+
         },
         {
           title: 'Type',
-          key: 'type'
+          key: 'type',
+          width: '170px'
         },
         {
           title: 'Quantité',
-          key: 'quantity'
+          key: 'quantity',
+          width: '170px'
+
         },
         {
           title: 'Cours',
-          key: 'price'
+          key: 'price',
+          width: '130px'
+          
         },
         {
           title: 'Brut',
@@ -159,12 +186,12 @@ export default {
           key: 'bank'
         },
         {
-          title: '',
-          key: 'save'
+          title: 'Diff. banque',
+          key: 'bankDiff'
         },
         {
           title: '',
-          key: 'edit'
+          key: 'save'
         },
         {
           title: '',
@@ -205,21 +232,10 @@ export default {
           key: 'totalcom'
         },
         {
-          title: 'Banque',
-          key: 'bank'
-        },
-        {
-          title: '',
-          key: 'save'
-        },
-        {
-          title: '',
-          key: 'edit'
-        },
-        {
           title: '',
           key: 'delete'
         }
+      
       ]
     }
   },
@@ -595,6 +611,13 @@ export default {
   },
 
   methods: {
+
+    onHeaderClick(header, event) {
+      // header contains the column information, including the key (value)
+      const columnKey = header.value;
+      console.log('Clicked on column with key:', columnKey);
+    },
+
     onShareSelected() {
       // Call the function when the selected share value changes
       if (this.selectedStock) {
@@ -620,24 +643,24 @@ export default {
       }
     },
 
-    editItem(item) {
-      // Logic for editing the item
-      // You can access the item's properties using item.propertyName
-      // For example: item.id, item.name, item.quantity, etc.
-      // Implement your custom logic to handle the edit action
-      console.log('Edit item:', item)
-    },
 
     async saveItem(item) {
-      this.transaction = item;
-      HistoryTransactionsService.updateTransaction(this.transaction)
+      this.transaction = item.value;
+
+      const tax = this.transaction.quantity * this.transaction.price * 0.007665;
+      this.transaction.tax = tax;
+      this.transaction.total = this.transaction.quantity * this.transaction.price;
+      this.transaction.totalcom = this.transaction.total - this.transaction.tax;
+
+      HistoryTransactionsService.updateTransaction(this.transaction.id, this.transaction)
         .then(() => {
 
-          alert('Transaction enregistrée avec succés!')
+          swal('Succès !', 'Transaction enregistrée avec succès!', 'success');
         })
         .catch((error) => {
           console.error(error)
-          alert('Failed to save transaction.')
+          swal('Erreur', 'Failed to save transaction.', 'error');
+
         })
     },
     async deleteItem(item) {
