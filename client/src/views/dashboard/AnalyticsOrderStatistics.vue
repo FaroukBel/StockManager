@@ -29,7 +29,7 @@ async function fetchTransactions() {
 
     // Now, nameTotals array contains the desired totals for each unique value
     const nameTotalsArray = Object.values(nameTotals).map((quantity) => quantity);
-    console.log(nameTotalsArray)
+
 
     // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
     transactions.value = nameTotalsArray;

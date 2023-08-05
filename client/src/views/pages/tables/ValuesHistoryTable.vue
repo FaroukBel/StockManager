@@ -38,6 +38,15 @@
           }) }}</p>
         </div>
       </template>
+      <template v-slot:item.diffStocks="{ item }">
+  
+      </template>
+      <template v-slot:item.diviTrans="{ item }">
+          <p>{{ item.value.diviTrans.toLocaleString('fr-MA', {
+            style: 'currency', currency: 'MAD'
+          }) }}</p>
+</template>
+
 
       <template v-slot:item.save="{ item }">
         <v-btn :loading="item.loading" elevation="0" icon color="green" v-on:click="this.saveItem(item)">
@@ -99,6 +108,14 @@ export default {
           title: 'Net',
           key: 'totalcom'
         },
+        {
+          title: 'Difference Actions',
+          key: 'quantityDiff'
+        },
+        {
+          title: 'Dividendes',
+          key: 'diviTrans'
+        }
       ],
     }
   },
@@ -110,7 +127,7 @@ export default {
 
   computed: {
 
-   
+
 
     formattedValue(value) {
       return this.formatCurrency(value);
@@ -245,30 +262,42 @@ export default {
       return value.toLocaleString('fr-MA', { style: 'currency', currency: 'MAD' })
     },
 
+    calculateDiffStocks() {
+      let diffStocks = 0;
+
+      this.transactions.forEach(transaction => {
+        const { value, quantityBuy, quantitySell } = transaction;
+        diffStocks = quantitySell- quantityBuy;
+      })
+      
+        return diffStocks;
+
+      
+    },
     calculateTotalNegValue(option) {
       let plusValue = 0;
       let minusValue = 0;
 
       this.transactions.forEach(transaction => {
-          const { value, type, totalcom } = transaction;
-          const totalcomValue = parseFloat(totalcom);
+        const { value, type, totalcom } = transaction;
+        const totalcomValue = parseFloat(totalcom);
 
-          if(totalcomValue > 0){
-            plusValue += totalcomValue;
-          }
-          else if(totalcomValue<0){
-            minusValue += totalcomValue;
-          }
+        if (totalcomValue > 0) {
+          plusValue += totalcomValue;
+        }
+        else if (totalcomValue < 0) {
+          minusValue += totalcomValue;
+        }
 
 
-    })
-    if(option ==="min"){
-      return this.formatCurrency(minusValue);
-    }
-    else{
-      return this.formatCurrency(plusValue);
+      })
+      if (option === "min") {
+        return this.formatCurrency(minusValue);
+      }
+      else {
+        return this.formatCurrency(plusValue);
 
-    }
+      }
     },
 
 
@@ -345,46 +374,61 @@ export default {
 
 
     async fetchTransactions() {
-      try {
-        const response = await HistoryTransactionsService.index();
-        this.transactions = response.data;
+  try {
+    const response = await HistoryTransactionsService.index();
+    const responseDivi = await HistoryTransactionsService.reqShares();
+    this.transactions = response.data;
+    this.diviTansactions = responseDivi.data;
 
-        // Calculate the buy and sell totals for each value
-        const nameTotals = {};
+    // Calculate the buy and sell totals for each value
+    const nameTotals = {};
 
-        this.transactions.forEach(transaction => {
-          const { value, type, totalcom } = transaction;
-          const totalcomValue = parseFloat(totalcom);
+    // Combine transactions and diviTansactions into one array
+    const allTransactions = [...this.transactions, ...this.diviTansactions];
+    allTransactions.forEach(transaction => {
+      const { value, type, quantity, totalcom } = transaction;
 
-          if (!nameTotals[value]) {
-            nameTotals[value] = { value, buyTotal: 0, sellTotal: 0, totalcomTotal: 0 };
-          }
 
-          if (type === "Achat") {
-            nameTotals[value].buyTotal += totalcomValue;
-          } else if (type === "Vente") {
-            nameTotals[value].sellTotal += totalcomValue;
-          }
-          const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
-          if (total > 0) {
-            const totalCom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) * 0.15;
-            nameTotals[value].totalcom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) - totalCom;
-          }
-          else {
-            nameTotals[value].totalcom = total;
-          }
-        });
+      const totalcomValue = parseFloat(totalcom);
 
-        // Now, nameTotals array contains the desired totals for each unique value
-        const nameTotalsArray = Object.values(nameTotals);
-
-        // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
-        this.transactions = nameTotalsArray;
-
-      } catch (error) {
-        console.error(error);
+      if (!nameTotals[value]) {
+        nameTotals[value] = { value, quantityBuy: 0, quantitySell: 0, quantityDiff: 0, diviTrans: 0, buyTotal: 0, sellTotal: 0, totalcomTotal: 0 };
       }
-    }
+      
+      if (type === "Achat") {
+        nameTotals[value].buyTotal += totalcomValue;
+        nameTotals[value].quantityBuy += parseFloat(quantity);
+      } else if (type === "Vente") {
+        nameTotals[value].quantitySell += parseFloat(quantity);
+        nameTotals[value].sellTotal += totalcomValue;
+      }else{
+        nameTotals[value].diviTrans += parseFloat(totalcom);
+        
+      }
+      
+      nameTotals[value].quantityDiff = Math.abs(nameTotals[value].quantitySell - nameTotals[value].quantityBuy);
+
+      const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
+      if (total > 0) {
+        const totalCom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) * 0.15;
+        nameTotals[value].totalcom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) - totalCom;
+      } else {
+        nameTotals[value].totalcom = total;
+      }
+    });
+
+    // Now, nameTotals array contains the desired totals for each unique value
+    const nameTotalsArray = Object.values(nameTotals);
+
+    // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
+    this.transactions = nameTotalsArray;
+
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 
 
 
