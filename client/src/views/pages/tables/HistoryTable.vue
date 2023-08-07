@@ -34,7 +34,7 @@
       <template v-slot:item.type="{ item }">
         <div class="d-flex type-columns"
           :style="item.value.type === 'Achat' ? ' background-color: #C4FF9B; height:70%; justify-content: center; align-items:center; color:black !important;' : 'height:70%; justify-content: center; align-items:center; color:black; height:70%;  background-color: #FF9B9B;  '">
-          <v-text-field  v-model="item.value.type" style="margin: 0;"></v-text-field>
+          <v-text-field v-model="item.value.type" style="margin: 0;"></v-text-field>
         </div>
       </template>
 
@@ -50,11 +50,7 @@
         <v-btn :loading="item.loading" elevation="0" icon color="red !important" v-on:click="this.deleteItem(item)">
           <v-icon dark>mdi-delete</v-icon>
         </v-btn></template>
-      <template v-slot:item.value="{ item }">
-
-        <v-select class="no-border-select" clearable v-model="item.value.value" :items="stockOptions"
-          :style="{ color: 'rgb(73, 249, 3) !important' }" outlined></v-select>
-      </template>
+     
       <template v-slot:item.bank="{ item }">
         <v-text-field class="no-border" v-model="item.value.bank"></v-text-field>
       </template>
@@ -68,10 +64,6 @@
       <template v-slot:item.bankDiff="{ item }">
         <p class="no-border text-white">{{ (parseFloat(item.value.totalcom) - parseFloat(item.value.bank)).toFixed(2) }}
         </p>
-      </template>
-      <template v-slot:item.date="{ item }">
-        <v-text-field v-model="item.value.date" :value="item.value.date" type="datetime-local"></v-text-field>
-
       </template>
 
     </v-data-table>
@@ -119,6 +111,14 @@
       <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
       <span>Total: <v-text-field readonly :value="formattedComputedTotal"></v-text-field></span>
     </div>
+    <div class="text-left total-net total-net-tva" :class="{ 'negative-value': computedTotalBank < 0 }">
+      <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
+      <span>Total banque: <v-text-field readonly :value="formattedTotalBank"></v-text-field></span>
+    </div>
+    <div class="text-left total-net total-net-tva" :class="{ 'negative-value': computedDiffBank < 0 }">
+      <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
+      <span>Diff. Banque: <v-text-field readonly :value="formatCurrency(computedDiffBank)"></v-text-field></span>
+    </div>
 
   </div>
 </template>
@@ -143,13 +143,11 @@ export default {
       HistoryTableHeaders: [
         {
           title: 'Date',
-          key: 'date',
-          width: '200px'
+          key: 'date'
         },
         {
           title: 'Valeur',
-          key: 'value',
-          width: '270px'
+          key: 'value'
 
         },
         {
@@ -167,7 +165,7 @@ export default {
           title: 'Cours',
           key: 'price',
           width: '130px'
-          
+
         },
         {
           title: 'Brut',
@@ -235,7 +233,7 @@ export default {
           title: '',
           key: 'delete'
         }
-      
+
       ]
     }
   },
@@ -251,6 +249,27 @@ export default {
       const total = parseFloat(totalNetTVAValue) + parseFloat(totalNetDividendesValue);
       return total;
     },
+    computedDiffBank(){
+      return -(this.computedTotalDiviNet - this.computedTotalBank);
+       
+    },
+    computedTotalBank() {
+      const totalColumnIndex = this.HistoryTableHeaders.findIndex(
+        (header) => header.key === 'bank'
+      )
+      if (totalColumnIndex === -1) return 0
+
+      return this.filteredTransactions.reduce((total, transaction) => {
+
+        if (transaction.bank > 0) {
+
+          const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
+          return total + amount
+        }
+        return total;
+      }, 0)
+      return total.toFixed(2)
+    },
     dynamicTableHeaders() {
       if (this.isAlternateHeader) {
         return this.DividendesHeaders;
@@ -260,6 +279,9 @@ export default {
     },
     formattedTotalDivi() {
       return this.formatCurrency(this.totalNetDividendes);
+    },
+    formattedTotalBank() {
+      return this.formatCurrency(this.computedTotalBank);
     },
     formattedComputedTotal() {
       return this.formatCurrency(this.computedTotalDiviNet);
@@ -643,14 +665,22 @@ export default {
       }
     },
 
-
+    async RoundNum(num, length) {
+      var number = Math.round(num * Math.pow(10, length)) / Math.pow(10, length);
+      return number;
+    },
     async saveItem(item) {
       this.transaction = item.value;
 
       const tax = this.transaction.quantity * this.transaction.price * 0.007665;
-      this.transaction.tax = tax;
-      this.transaction.total = this.transaction.quantity * this.transaction.price;
-      this.transaction.totalcom = this.transaction.total - this.transaction.tax;
+      this.transaction.tax = tax.toFixed(2);
+      this.transaction.total = (this.transaction.quantity * this.transaction.price).toFixed(2);
+      if (this.transaction.type === "Achat") {
+        this.transaction.totalcom = (parseFloat(this.transaction.total) + parseFloat(this.transaction.tax)).toFixed(2);
+      }
+      else {
+        this.transaction.totalcom = (this.transaction.total - this.transaction.tax).toFixed(2);
+      }
 
       HistoryTransactionsService.updateTransaction(this.transaction.id, this.transaction)
         .then(() => {

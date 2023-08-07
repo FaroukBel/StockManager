@@ -77,6 +77,10 @@
         <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
         <span>Total +Value: <v-text-field readonly :value="calculateTotalNegValue('plus')"></v-text-field></span>
       </div>
+      <div class="text-left total-net total-net-tva">
+        <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
+        <span>Total Dividendes: <v-text-field readonly :value="calculateTotalDivi()"></v-text-field></span>
+      </div>
 
     </div>
     <v-card class="mt-2 pa-2">
@@ -298,6 +302,17 @@ export default {
         return this.formatCurrency(plusValue);
 
       }
+    },
+
+    calculateTotalDivi() {
+      let totalDivi= 0;
+      this.transactions.forEach(transaction => {
+        const {diviTrans } = transaction;
+      
+        totalDivi += diviTrans;
+
+      })
+      return this.formatCurrency(totalDivi);
     },
 
 
