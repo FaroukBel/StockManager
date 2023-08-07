@@ -307,7 +307,7 @@ export default {
     calculateTotalDivi() {
       let totalDivi= 0;
       this.transactions.forEach(transaction => {
-        const {diviTrans } = transaction;
+        const {diviTrans, type } = transaction;
       
         totalDivi += diviTrans;
 

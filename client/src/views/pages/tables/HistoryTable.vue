@@ -258,17 +258,23 @@ export default {
         (header) => header.key === 'bank'
       )
       if (totalColumnIndex === -1) return 0
-
+      let totalAchatBank= 0;
+      let totalVenteBank= 0;
       return this.filteredTransactions.reduce((total, transaction) => {
 
         if (transaction.bank > 0) {
+          if(transaction.type==="Achat"){
+  totalAchatBank += parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
+}else{
+  totalVenteBank += parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
+}
 
-          const amount = parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
-          return total + amount
-        }
-        return total;
+return totalVenteBank - totalAchatBank
+         
+}
+        return totalVenteBank - totalAchatBank;
       }, 0)
-      return total.toFixed(2)
+      return (totalVenteBank - totalAchatBank).toFixed(2)
     },
     dynamicTableHeaders() {
       if (this.isAlternateHeader) {
