@@ -13,71 +13,70 @@ const formattedDate = currentDate.toLocaleString('en-GB', {
 
 <template>
   <VForm ref="myForm" @submit.prevent>
-    <VRow>
-      <!-- 👉 Valeur dropdown -->
-      <VCol cols="12" md="12">
-        <VSelect 
-        clearable
-         v-model="transaction.stock" :items="valeurOptions" label="Valeur" placeholder="Sélectionnez une valeur" required
-          :style="{ color: 'rgb(73, 249, 3) !important' }" />
-      </VCol>
-      <VCol cols="12" md="6">
-        <v-text-field v-model="transaction.date_engagement" label="Date de d'engagement" type="datetime-local"></v-text-field>
-      </VCol>
-      <VCol cols="12" md="6">
-        <v-text-field v-model="transaction.date_detachement" label="Date de détachement" type="datetime-local"></v-text-field>
-      </VCol>
 
-      <!-- 👉 Date -->
-      <!-- <VCol cols="12" md="6">
-        <v-date-picker
-          v-model="transaction.date"
-          label="Date"
-          :value="currentDate"
-          required
-        />
-      </VCol> -->
+    <VCard>
+      <div class="card-header">
+        <h2 class="card-title">Dividendes</h2>
+        <v-switch v-model="someSwitch" label="Mode libre" @change="handleSwitchChange"></v-switch>
+      </div>
+      <VCardText>
+        <VRow>
+          <!-- 👉 Valeur dropdown -->
+          <VCol cols="12" md="12">
+            <VSelect clearable v-model="transaction.stock" :items="valeurOptions" label="Valeur"
+              placeholder="Sélectionnez une valeur" required :style="{ color: 'rgb(73, 249, 3) !important' }" />
+          </VCol>
+          <VCol cols="12" md="6">
+            <v-text-field v-model="transaction.date_engagement" label="Date de d'engagement"
+              type="datetime-local"></v-text-field>
+          </VCol>
+          <VCol cols="12" md="6">
+            <v-text-field v-model="transaction.date_detachement" label="Date de détachement"
+              type="datetime-local"></v-text-field>
+          </VCol>
 
+          <!-- 👉 Quantity -->
+          <VCol cols="12" md="6">
+            <VTextField v-model="transaction.quantity" :disabled="someSwitch" label="Quantité" placeholder="" min="0"
+              :required="!someSwitch" type="number" :style="{ color: 'rgb(73, 249, 3) !important' }" />
+          </VCol>
 
-      <!-- 👉 Quantity -->
-      <VCol cols="12" md="6">
-        <VTextField v-model="transaction.quantity" label="Quantité" placeholder="" min="0" required type="number"
-          :style="{ color: 'rgb(73, 249, 3) !important' }" />
-      </VCol>
+          <!-- 👉 Buy Price -->
+          <VCol cols="12" md="6">
+            <VTextField v-model="transaction.buyprice" :label="priceLabel" placeholder="" type="number" min="0" required
+              :style="{ color: 'rgb(73, 249, 3) !important' }" />
+          </VCol>
 
-      <!-- 👉 Buy Price -->
-      <VCol cols="12" md="6">
-        <VTextField v-model="transaction.buyprice" label="Prix d'achat" placeholder="" type="number" min="0" required
-          :style="{ color: 'rgb(73, 249, 3) !important' }" />
-      </VCol>
+          <!-- 👉 Commission -->
+          <VCol cols="12" md="6">
+            <VTextField v-model="transaction.tax" label="Commission" :disabled="someSwitch" placeholder="" readonly
+              type="number" :required="!someSwitch" :style="{ color: 'rgb(73, 249, 3) !important' }" />
+          </VCol>
 
-      <!-- 👉 Commission -->
-      <VCol cols="12" md="6">
-        <VTextField v-model="transaction.tax" label="Commission" placeholder="" readonly type="number" required
-          :style="{ color: 'rgb(73, 249, 3) !important' }" />
-      </VCol>
+          <!-- 👉 Total -->
+          <VCol cols="12" md="6">
+            <VTextField v-model="transaction.total" :label="labelTotal" placeholder="" readonly type="number" required
+              :style="{ color: 'rgb(73, 249, 3) !important' }" />
+          </VCol>
 
-      <!-- 👉 Total -->
-      <VCol cols="12" md="6">
-        <VTextField v-model="transaction.total" label="Total" placeholder="" readonly type="number" required
-          :style="{ color: 'rgb(73, 249, 3) !important' }" />
-      </VCol>
+          <!-- 👉 Total + Commission -->
+          <VCol cols="12" md="12">
+            <VTextField v-model="transaction.totalcom" :label="labelTotalCom" placeholder="" 
+              readonly type="number" :required="!someSwitch" :style="{ color: 'rgb(73, 249, 3) !important' }" />
+          </VCol>
 
-      <!-- 👉 Total + Commission -->
-      <VCol cols="12" md="12">
-        <VTextField v-model="transaction.totalcom" label="Total + Commission" placeholder="" readonly type="number"
-          required :style="{ color: 'rgb(73, 249, 3) !important' }" />
-      </VCol>
+          <VCol cols="12" class="d-flex gap-4">
+            <VBtn color="secondary" variant="tonal" @click="clearForm">
+              Effacer
+            </VBtn>
+            <VBtn @click="submitForm" color="success">
+              <span style="color: black;">Ajouter</span>
+            </VBtn>
+          </VCol>
+        </VRow>
+      </VCardText>
 
-      <VCol cols="12" class="d-flex gap-4">
-        <VBtn color="secondary" variant="tonal" @click="clearForm">
-          Effacer
-        </VBtn>
-        <VBtn @click="submitForm" color="success">
-          <span style="color: black;">Ajouter</span>
-        </VBtn>
-      </VCol>
-    </VRow>
+    </VCard>
   </VForm>
 </template>
 
@@ -97,6 +96,11 @@ const formattedDate = currentDate.toLocaleString('en-GB', {
 export default {
   data() {
     return {
+      someSwitch: false,
+      priceLabel: "Prix d'achat",
+      labelTotal: "Total",
+      labelTotalCom: "Total + Commission",
+
       transaction: {
         date_engagement: this.getCurrentDateTime(0),
         date_detachement: this.getCurrentDateTime(1),
@@ -105,7 +109,8 @@ export default {
         buyprice: '',
         total: '',
         tax: '',
-        totalcom: ''
+        totalcom: '',
+
 
       },
       valeurOptions: ["AFMA SA",
@@ -184,7 +189,7 @@ export default {
         "Zellidja S.A"], // Static list of dropdown options
     };
   },
-  mounted(){
+  mounted() {
     this.transaction.date_engagement = this.getCurrentDateTime(0);
     this.transaction.date_detachement = this.getCurrentDateTime(1);
   },
@@ -211,6 +216,33 @@ export default {
 
   },
   methods: {
+
+    handleSwitchChange(newValue) {
+      if (newValue) {
+        // The switch has been turned on
+        // Call your function or perform actions here
+        this.doSomethingOnSwitchOn();
+        this.calculateTotal();
+        this.calculatePL();
+
+
+      }
+    },
+    doSomethingOnSwitchOn() {
+
+      if (this.someSwitch) {
+        this.labelTotal = "Total";
+        this.priceLabel = "Montant";
+        this.labelTotalCom = "Total net";
+        console.log(`Switch is turned !`);
+
+      } else {
+        this.labelTotal = "Total";
+        this.priceLabel = "Prix d'achat";
+        this.labelTotalCom = "Total + Commissiom";
+      }
+
+    },
     getCurrentDateTime(step) {
       const now = new Date();
       const year = now.getFullYear();
@@ -218,7 +250,7 @@ export default {
       const day = String(now.getDate() + step).padStart(2, '0');
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
-      
+
       // Format the date to be compatible with datetime-local input
       return `${year}-${month}-${day}T${hours}:${minutes}`;
     },
@@ -228,34 +260,56 @@ export default {
     calculateTotal() {
       const quantity = parseFloat(this.transaction.quantity);
       const buyPrice = parseFloat(this.transaction.buyprice);
-      if (!isNaN(quantity) && !isNaN(buyPrice)) {
+
+      if (this.someSwitch && !isNaN(buyPrice)) {
+        this.transaction.total = (buyPrice).toFixed(2);
+
+      } else if (!isNaN(quantity) && !isNaN(buyPrice)) {
         this.transaction.total = (quantity * buyPrice).toFixed(2);
+
       } else {
         this.transaction.total = '';
       }
+
     },
     calculatePL() {
       const quantity = parseFloat(this.transaction.quantity);
       const buyPrice = parseFloat(this.transaction.buyprice);
-      if (!isNaN(quantity) && !isNaN(buyPrice)) {
-        
-        this.transaction.tax = this.transaction.total * 0.15;
-        this.transaction.totalcom = parseFloat(this.transaction.total) - parseFloat(this.transaction.tax);
-      }
+      if (this.someSwitch && !isNaN(buyPrice)) {
 
+          this.transaction.tax = 0;
+
+          this.transaction.totalcom = parseFloat(this.transaction.total);
+         } else if (!isNaN(quantity) && !isNaN(buyPrice)) {        
+       
+          this.transaction.tax = (this.transaction.total * 0.15).toFixed(2);
+          this.transaction.totalcom = (parseFloat(this.transaction.total) - parseFloat(this.transaction.tax)).toFixed(2);
+        }
     },
     async submitForm() {
-      if (
-        !this.transaction.stock ||
-        !this.transaction.quantity ||
-        !this.transaction.buyprice ||
-        !this.transaction.total ||
-        !this.transaction.totalcom
-      ) {
-        swal('Important','Veuillez remplir les champs obligatoires.', 'info');
+      if (!this.someSwitch) {
+        if (!this.transaction.stock ||
+          !this.transaction.quantity ||
+          !this.transaction.buyprice ||
+          !this.transaction.total ||
+          !this.transaction.totalcom) {
+          swal('Important', 'Veuillez remplir les champs obligatoires.', 'info');
 
-        return;
+          return;
+        }
       }
+      else {
+        if (
+          !this.transaction.buyprice 
+         
+        ) {
+          swal('Important', 'Veuillez remplir les champs obligatoires.', 'info');
+
+          return;
+        }
+
+      }
+
 
       HistoryTransactionsService.postShare(this.transaction)
         .then(() => {
@@ -264,14 +318,14 @@ export default {
           this.transaction.totalcom = '';
           this.transaction.total = '';
           this.transaction.tax = '';
-          
+
           this.$emit('addShareTransaction');
-          swal('Succès !','Transaction enregistrée avec succès!', 'success');
+          swal('Succès !', 'Transaction enregistrée avec succès!', 'success');
 
         })
         .catch((error) => {
           console.error(error);
-          swal('Erreur','Failed to save transaction.', 'error');
+          swal('Erreur', 'Failed to save transaction.', 'error');
         });
     },
     async clearForm() {
@@ -289,4 +343,21 @@ export default {
 };
 </script>
 
+<style>
+.card-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 16px;
+  border-bottom: 1px solid rgb(158, 158, 158);
 
+}
+
+.card-title {
+  margin: 0;
+}
+
+.title-switch {
+  margin-left: 16px;
+}
+</style>

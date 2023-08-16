@@ -40,13 +40,8 @@ import wallet from '@images/cards/wallet-info.png'
     </VCol>
     <VCol cols="12" md="6" class="d-flex flex-row">
 
-      <VCard title="Dividendes">
-        <VCardText>
-
           <Shares @addShareTransaction="updateTable" />
-        </VCardText>
-
-      </VCard>
+    
     </VCol>
 
 
