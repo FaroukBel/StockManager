@@ -16,14 +16,14 @@ const formattedDate = currentDate.toLocaleString('en-GB', {
 
     <VCard>
       <div class="card-header">
-        <h2 class="card-title">Dividendes</h2>
+        <h2 class="card-title">{{ divTitle }}</h2>
         <v-switch v-model="someSwitch" label="Mode libre" @change="handleSwitchChange"></v-switch>
       </div>
       <VCardText>
         <VRow>
           <!-- 👉 Valeur dropdown -->
           <VCol cols="12" md="12">
-            <VSelect clearable v-model="transaction.stock" :items="valeurOptions" label="Valeur"
+            <VSelect clearable v-model="transaction.stock" :items="stockOptions" label="Valeur"
               placeholder="Sélectionnez une valeur" required :style="{ color: 'rgb(73, 249, 3) !important' }" />
           </VCol>
           <VCol cols="12" md="6">
@@ -61,8 +61,8 @@ const formattedDate = currentDate.toLocaleString('en-GB', {
 
           <!-- 👉 Total + Commission -->
           <VCol cols="12" md="12">
-            <VTextField v-model="transaction.totalcom" :label="labelTotalCom" placeholder="" 
-              readonly type="number" :required="!someSwitch" :style="{ color: 'rgb(73, 249, 3) !important' }" />
+            <VTextField v-model="transaction.totalcom" :label="labelTotalCom" placeholder="" readonly type="number"
+              :required="!someSwitch" :style="{ color: 'rgb(73, 249, 3) !important' }" />
           </VCol>
 
           <VCol cols="12" class="d-flex gap-4">
@@ -96,6 +96,7 @@ const formattedDate = currentDate.toLocaleString('en-GB', {
 export default {
   data() {
     return {
+      divTitle: "Dividendes",
       someSwitch: false,
       priceLabel: "Prix d'achat",
       labelTotal: "Total",
@@ -186,10 +187,12 @@ export default {
         "Travaux Generaux De Construction",
         "Unimer",
         "Wafa Assurance",
-        "Zellidja S.A"], // Static list of dropdown options
+        "Zellidja S.A"],
+        stockOptions:"", // Static list of dropdown options
     };
   },
   mounted() {
+    this.stockOptions = this.valeurOptions;
     this.transaction.date_engagement = this.getCurrentDateTime(0);
     this.transaction.date_detachement = this.getCurrentDateTime(1);
   },
@@ -234,112 +237,115 @@ export default {
         this.labelTotal = "Total";
         this.priceLabel = "Montant";
         this.labelTotalCom = "Total net";
+        this.divTitle = "Taxe immobilière"
+        this.stockOptions = ["Taxe immobilière",]
+        
         console.log(`Switch is turned !`);
 
       } else {
         this.labelTotal = "Total";
         this.priceLabel = "Prix d'achat";
         this.labelTotalCom = "Total + Commissiom";
-      }
+        this.divTitle = "Dividendes";
+        this.stockOptions = this.valeurOptions;
+    };
 
-    },
-    getCurrentDateTime(step) {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate() + step).padStart(2, '0');
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-
-      // Format the date to be compatible with datetime-local input
-      return `${year}-${month}-${day}T${hours}:${minutes}`;
-    },
-    handleDataUpdate(data) {
-      this.dataFromTransactionForm = data;
-    },
-    calculateTotal() {
-      const quantity = parseFloat(this.transaction.quantity);
-      const buyPrice = parseFloat(this.transaction.buyprice);
-
-      if (this.someSwitch && !isNaN(buyPrice)) {
-        this.transaction.total = (buyPrice).toFixed(2);
-
-      } else if (!isNaN(quantity) && !isNaN(buyPrice)) {
-        this.transaction.total = (quantity * buyPrice).toFixed(2);
-
-      } else {
-        this.transaction.total = '';
-      }
-
-    },
-    calculatePL() {
-      const quantity = parseFloat(this.transaction.quantity);
-      const buyPrice = parseFloat(this.transaction.buyprice);
-      if (this.someSwitch && !isNaN(buyPrice)) {
-
-          this.transaction.tax = 0;
-
-          this.transaction.totalcom = parseFloat(this.transaction.total);
-         } else if (!isNaN(quantity) && !isNaN(buyPrice)) {        
-       
-          this.transaction.tax = (this.transaction.total * 0.15).toFixed(2);
-          this.transaction.totalcom = (parseFloat(this.transaction.total) - parseFloat(this.transaction.tax)).toFixed(2);
-        }
-    },
-    async submitForm() {
-      if (!this.someSwitch) {
-        if (!this.transaction.stock ||
-          !this.transaction.quantity ||
-          !this.transaction.buyprice ||
-          !this.transaction.total ||
-          !this.transaction.totalcom) {
-          swal('Important', 'Veuillez remplir les champs obligatoires.', 'info');
-
-          return;
-        }
-      }
-      else {
-        if (
-          !this.transaction.buyprice 
-         
-        ) {
-          swal('Important', 'Veuillez remplir les champs obligatoires.', 'info');
-
-          return;
-        }
-
-      }
-
-
-      HistoryTransactionsService.postShare(this.transaction)
-        .then(() => {
-          this.transaction.quantity = '';
-          this.transaction.buyprice = '';
-          this.transaction.totalcom = '';
-          this.transaction.total = '';
-          this.transaction.tax = '';
-
-          this.$emit('addShareTransaction');
-          swal('Succès !', 'Transaction enregistrée avec succès!', 'success');
-
-        })
-        .catch((error) => {
-          console.error(error);
-          swal('Erreur', 'Failed to save transaction.', 'error');
-        });
-    },
-    async clearForm() {
-
-      this.transaction = {
-        stock: '',
-        quantity: '',
-        buyprice: '',
-        total: '',
-        totalcom: ''
-      };
-
-    },
+ 
   },
+  getCurrentDateTime(step) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate() + step).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    // Format the date to be compatible with datetime-local input
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  },
+  handleDataUpdate(data) {
+    this.dataFromTransactionForm = data;
+  },
+  calculateTotal() {
+    const quantity = parseFloat(this.transaction.quantity);
+    const buyPrice = parseFloat(this.transaction.buyprice);
+
+    if (this.someSwitch && !isNaN(buyPrice)) {
+      this.transaction.total = (buyPrice).toFixed(2);
+
+    } else if (!isNaN(quantity) && !isNaN(buyPrice)) {
+      this.transaction.total = (quantity * buyPrice).toFixed(2);
+
+    } else {
+      this.transaction.total = '';
+    }
+
+  },
+  calculatePL() {
+    const quantity = parseFloat(this.transaction.quantity);
+    const buyPrice = parseFloat(this.transaction.buyprice);
+    if (this.someSwitch && !isNaN(buyPrice)) {
+
+      this.transaction.tax = 0;
+
+      this.transaction.totalcom = parseFloat(this.transaction.total);
+    } else if (!isNaN(quantity) && !isNaN(buyPrice)) {
+
+      this.transaction.tax = (this.transaction.total * 0.15).toFixed(2);
+      this.transaction.totalcom = (parseFloat(this.transaction.total) - parseFloat(this.transaction.tax)).toFixed(2);
+    }
+  },
+  async submitForm() {
+    if (!this.someSwitch) {
+      if (!this.transaction.stock ||
+        !this.transaction.quantity ||
+        !this.transaction.buyprice ||
+        !this.transaction.total ||
+        !this.transaction.totalcom) {
+        swal('Important', 'Veuillez remplir les champs obligatoires.', 'info');
+        return;
+      }
+    }
+    else {
+      if (
+        !this.transaction.buyprice
+      ) {
+        swal('Important', 'Veuillez remplir les champs obligatoires.', 'info');
+        return;
+      }
+
+    }
+
+
+    HistoryTransactionsService.postShare(this.transaction)
+      .then(() => {
+        this.transaction.quantity = '';
+        this.transaction.buyprice = '';
+        this.transaction.totalcom = '';
+        this.transaction.total = '';
+        this.transaction.tax = '';
+
+        this.$emit('addShareTransaction');
+        swal('Succès !', 'Transaction enregistrée avec succès!', 'success');
+
+      })
+      .catch((error) => {
+        console.error(error);
+        swal('Erreur', 'Failed to save transaction.', 'error');
+      });
+  },
+  async clearForm() {
+
+    this.transaction = {
+      stock: '',
+      quantity: '',
+      buyprice: '',
+      total: '',
+      totalcom: ''
+    };
+
+  },
+},
 };
 </script>
 
