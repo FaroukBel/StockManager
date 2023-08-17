@@ -17,11 +17,18 @@
 
       <v-col cols="5" class="text-right">
         <v-radio-group v-model="filterType" :value="'Tout'">
-          <div style="display: flex; flex-direction: row; justify-content: space-between;">
-            <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Tout" label="Tout"></v-radio>
-            <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Achat" label="Achat"></v-radio>
-            <v-radio value="Vente" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Vente"></v-radio>
-            <v-radio value="Dividendes" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Dividendes"></v-radio>
+          <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <v-row>
+              <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Tout" label="Tout"></v-radio>
+              <v-radio :style="{ color: 'rgb(73, 249, 3) !important' }" value="Achat" label="Achat"></v-radio>
+              <v-radio value="Vente" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Vente"></v-radio>
+            </v-row>
+            <v-row>
+              <v-radio value="Dividendes" :style="{ color: 'rgb(73, 249, 3) !important' }" label="Dividendes"></v-radio>
+              <v-radio value="Taxe immobilière" :style="{ color: 'rgb(73, 249, 3) !important' }"
+                label="Taxe immobilière"></v-radio>
+            </v-row>
+
           </div>
         </v-radio-group>
       </v-col>
@@ -50,7 +57,7 @@
         <v-btn :loading="item.loading" elevation="0" icon color="red !important" v-on:click="this.deleteItem(item)">
           <v-icon dark>mdi-delete</v-icon>
         </v-btn></template>
-     
+
       <template v-slot:item.bank="{ item }">
         <v-text-field class="no-border" v-model="item.value.bank"></v-text-field>
       </template>
@@ -99,7 +106,6 @@
       <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
       <span>Total Commission: <v-text-field readonly :value="formattedTotalCommission"></v-text-field></span>
     </div>
-
     <!-- Assuming you have access to totalNetTVA and totalNetDividendes variables -->
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
       <span>Total Net: <v-text-field readonly :value="formattedTotalNet"></v-text-field></span>
@@ -138,7 +144,7 @@ export default {
       totalNet: 0,
       selected: [],
       tableKey: 0,
-      isAlternateHeader: false,
+      isAlternateHeader: "tout",
       editingColumn: null,
       HistoryTableHeaders: [
         {
@@ -211,11 +217,13 @@ export default {
         },
         {
           title: 'Quantité',
-          key: 'quantity'
+          key: 'quantity',
+          width: '170px'
         },
         {
           title: 'Cours',
-          key: 'price'
+          key: 'price',
+          width: '170px'
         },
         {
           title: 'Brut',
@@ -233,8 +241,35 @@ export default {
           title: '',
           key: 'delete'
         }
-
+      ],
+      ImmoHeaders: [
+        {
+          title: 'Engagement',
+          key: 'date_engagement'
+        },
+        {
+          title: 'Valeur',
+          key: 'value'
+        },
+        {
+          title: 'Motant',
+          key: 'price',
+          width: '300px'
+        },
+        {
+          title: 'Brut',
+          key: 'total'
+        },
+        {
+          title: 'Net',
+          key: 'totalcom'
+        },
+        {
+          title: '',
+          key: 'delete'
+        }
       ]
+
     }
   },
   created() {
@@ -249,38 +284,40 @@ export default {
       const total = parseFloat(totalNetTVAValue) + parseFloat(totalNetDividendesValue);
       return total;
     },
-    computedDiffBank(){
+    computedDiffBank() {
       return -(this.computedTotalDiviNet - this.computedTotalBank);
-       
+
     },
     computedTotalBank() {
       const totalColumnIndex = this.HistoryTableHeaders.findIndex(
         (header) => header.key === 'bank'
       )
       if (totalColumnIndex === -1) return 0
-      let totalAchatBank= 0;
-      let totalVenteBank= 0;
+      let totalAchatBank = 0;
+      let totalVenteBank = 0;
       return this.filteredTransactions.reduce((total, transaction) => {
 
         if (transaction.bank > 0) {
-          if(transaction.type==="Achat"){
-  totalAchatBank += parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
-}else{
-  totalVenteBank += parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
-}
+          if (transaction.type === "Achat") {
+            totalAchatBank += parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
+          } else {
+            totalVenteBank += parseFloat(transaction[this.HistoryTableHeaders[totalColumnIndex].key])
+          }
 
-return totalVenteBank - totalAchatBank
-         
-}
+          return totalVenteBank - totalAchatBank
+
+        }
         return totalVenteBank - totalAchatBank;
       }, 0)
       return (totalVenteBank - totalAchatBank).toFixed(2)
     },
     dynamicTableHeaders() {
-      if (this.isAlternateHeader) {
+      if (this.isAlternateHeader === "div") {
         return this.DividendesHeaders;
-      } else {
+      } else if(this.isAlternateHeader === "tout"){
         return this.HistoryTableHeaders;
+      }else{
+        return this.ImmoHeaders;
       }
     },
     formattedTotalDivi() {
@@ -311,7 +348,7 @@ return totalVenteBank - totalAchatBank
       return this.formatCurrency(this.totalCommision);
     },
     dynamicFilter() {
-      if (this.isAlternateHeader) {
+      if (this.isAlternateHeader === "div" || this.isAlternateHeader === "immo") {
         return this.filteredSharesTransactions
       }
       else {
@@ -320,9 +357,12 @@ return totalVenteBank - totalAchatBank
     },
 
     filteredSharesTransactions() {
-      if (!this.selectedStock && !this.search && this.filterType == 'Dividendes') {
-
-        return this.sharesTransactions;
+      if (!this.selectedStock && !this.search && this.filterType == 'Dividendes' ) {
+        const filteredTransactions = this.sharesTransactions.filter(transaction => !transaction.value.includes('Taxe immobilière'));
+        return filteredTransactions;
+      }else if(!this.selectedStock && !this.search && this.filterType == 'Taxe immobilière'){
+        const filteredTransactions = this.sharesTransactions.filter(transaction => transaction.value.includes('Taxe immobilière'));
+        return filteredTransactions;
 
       }
 
@@ -356,9 +396,10 @@ return totalVenteBank - totalAchatBank
           this.filterType &&
           this.filterType !== 'Tout' &&
           this.filterType !== 'Dividendes' &&
+          this.filterType !== 'Taxe immobilière' &&
           !transaction.type.toLowerCase().includes(this.filterType.toLowerCase())
         ) {
-          this.isAlternateHeader = false;
+          this.isAlternateHeader = "tout";
 
           return false
         }
@@ -373,13 +414,17 @@ return totalVenteBank - totalAchatBank
           return false
         }
         if (this.filterType == 'Dividendes') {
-          this.isAlternateHeader = true;
+          this.isAlternateHeader = "div";
+
+        }
+        if (this.filterType == 'Taxe immobilière') {
+          this.isAlternateHeader = "immo";
 
         }
         if (
           this.filterType &&
           this.filterType == 'Tout') {
-          this.isAlternateHeader = false;
+          this.isAlternateHeader = 'tout';
 
           return true
         }

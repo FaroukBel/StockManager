@@ -233,14 +233,13 @@ export default {
     },
     doSomethingOnSwitchOn() {
 
-      if (this.someSwitch) {
+      if (this.someSwitch) {  
         this.labelTotal = "Total";
         this.priceLabel = "Montant";
         this.labelTotalCom = "Total net";
         this.divTitle = "Taxe immobilière"
         this.stockOptions = ["Taxe immobilière",]
-        
-        console.log(`Switch is turned !`);
+      
 
       } else {
         this.labelTotal = "Total";
