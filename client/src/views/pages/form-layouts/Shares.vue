@@ -307,6 +307,7 @@ export default {
     }
     else {
       if (
+        !this.transaction.stock ||
         !this.transaction.buyprice
       ) {
         swal('Important', 'Veuillez remplir les champs obligatoires.', 'info');

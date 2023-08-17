@@ -82,16 +82,16 @@
 
   <div class="d-flex justify-content-between">
     <div class="text-left total-net">
-      <div>CUMP Achat: <v-text-field readonly :value="weightedAchat"> </v-text-field></div>
+      <div>CUMP Achat: <v-text-field readonly :value="formatCurrency(weightedAchat)"> </v-text-field></div>
     </div>
     <div class="text-left total-net">
-      <div>CUMP Vente: <v-text-field readonly :value="weightedVente"></v-text-field></div>
+      <div>CUMP Vente: <v-text-field readonly :value="formatCurrency(weightedVente)"></v-text-field></div>
     </div>
     <div class="text-left total-net">
-      <div>Total Actions Achat: <v-text-field readonly :value="formattedAchat"> </v-text-field></div>
+      <div>Total Actions Achat: <v-text-field readonly :value="totalQuantityAchat.toLocaleString('fr-MA')"> </v-text-field></div>
     </div>
     <div class="text-left total-net">
-      <div>Total Actions Vente: <v-text-field readonly :value="formattedVente"></v-text-field></div>
+      <div>Total Actions Vente: <v-text-field readonly :value="totalQuantityVente.toLocaleString('fr-MA')"></v-text-field></div>
     </div>
     <div class="text-left total-net">
       <div>Total Net Achat: <v-text-field readonly :value="formattedTotalNetAchat"></v-text-field></div>
@@ -100,29 +100,33 @@
       <div>Total Net Vente: <v-text-field readonly :value="formattedTotalNetVente"></v-text-field></div>
     </div>
   </div>
+  <div class="ml-5">
+
+    <h2>Totaux:</h2>
+  </div>
+  <v-divider class="mb-5 mt-2"></v-divider>
 
   <div class="d-flex justify-content-between">
     <div class="text-left total-net ">
-      <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
-      <span>Total Commission: <v-text-field readonly :value="formattedTotalCommission"></v-text-field></span>
+      <span>Commission: <v-text-field readonly :value="formattedTotalCommission"></v-text-field></span>
     </div>
-    <!-- Assuming you have access to totalNetTVA and totalNetDividendes variables -->
+
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetTVA < 0 }">
-      <span>Total Net: <v-text-field readonly :value="formattedTotalNet"></v-text-field></span>
+      <span>Net: <v-text-field readonly :value="formattedTotalNet"></v-text-field></span>
+    </div>
+    <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetImmo < 0 }">
+      <span>Taxe immobilière: <v-text-field readonly :value="formatCurrency(totalNetImmo)"></v-text-field></span>
     </div>
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': totalNetDividendes < 0 }">
-      <span>Total Dividendes: <v-text-field readonly :value="formattedTotalDivi"></v-text-field></span>
+      <span>Dividendes: <v-text-field readonly :value="formattedTotalDivi"></v-text-field></span>
     </div>
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': computedTotalDiviNet < 0 }">
-      <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
       <span>Total: <v-text-field readonly :value="formattedComputedTotal"></v-text-field></span>
     </div>
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': computedTotalBank < 0 }">
-      <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
-      <span>Total banque: <v-text-field readonly :value="formattedTotalBank"></v-text-field></span>
+      <span>Banque: <v-text-field readonly :value="formattedTotalBank"></v-text-field></span>
     </div>
     <div class="text-left total-net total-net-tva" :class="{ 'negative-value': computedDiffBank < 0 }">
-      <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
       <span>Diff. Banque: <v-text-field readonly :value="formatCurrency(computedDiffBank)"></v-text-field></span>
     </div>
 
@@ -462,7 +466,7 @@ export default {
 
 
       }, 0)
-      return (totalWeightedPrice / totalQuantity).toFixed(2);
+      return totalWeightedPrice / totalQuantity;
 
     },
 
@@ -495,7 +499,7 @@ export default {
 
 
       }, 0)
-      return (totalWeightedPrice / totalQuantity).toFixed(2);
+      return totalWeightedPrice / totalQuantity;
 
     },
     totalNetAchat() {
@@ -569,11 +573,35 @@ export default {
       if (totalColumnIndex === -1) return 0
 
       return this.filteredSharesTransactions.reduce((total, transaction) => {
+        if(transaction.value !=="Taxe immobilière"){
+        
         const amount = parseFloat(transaction[this.DividendesHeaders[totalColumnIndex].key])
         return total + amount
+        }
+        return total;
       }, 0)
       return total.toFixed(2)
     },
+
+    totalNetImmo() {
+      const totalColumnIndex = this.DividendesHeaders.findIndex(
+        (header) => header.key === 'totalcom'
+      )
+      if (totalColumnIndex === -1) return 0
+
+      return this.filteredSharesTransactions.reduce((total, transaction) => {
+        if(transaction.value==="Taxe immobilière"){
+          const amount = parseFloat(transaction[this.DividendesHeaders[totalColumnIndex].key])
+          return total + amount
+
+        }
+        return total
+
+      }, 0)
+      return total.toFixed(2)
+    },
+
+
     totalCommision() {
       const totalColumnIndex = this.HistoryTableHeaders.findIndex(
         (header) => header.key === 'tax'

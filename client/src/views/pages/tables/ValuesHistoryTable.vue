@@ -39,13 +39,13 @@
         </div>
       </template>
       <template v-slot:item.diffStocks="{ item }">
-  
+
       </template>
       <template v-slot:item.diviTrans="{ item }">
-          <p>{{ item.value.diviTrans.toLocaleString('fr-MA', {
-            style: 'currency', currency: 'MAD'
-          }) }}</p>
-</template>
+        <p>{{ item.value.diviTrans.toLocaleString('fr-MA', {
+          style: 'currency', currency: 'MAD'
+        }) }}</p>
+      </template>
 
 
       <template v-slot:item.save="{ item }">
@@ -67,19 +67,27 @@
         <v-text-field class="no-border"></v-text-field>
       </template>
     </v-data-table>
+    <div class="mt-5 ml-5">
 
+      <h2>Totaux:</h2>
+    </div>
+    <v-divider class="mb-5 mt-2"></v-divider>
     <div class="d-flex justify-content-between">
 
       <div class="text-left total-net total-net-tva negative-value">
-        <span>Total -Value: <v-text-field readonly :value="calculateTotalNegValue('min')"></v-text-field></span>
+        <span>-Value: <v-text-field readonly :value="calculateTotalNegValue('min')"></v-text-field></span>
       </div>
       <div class="text-left total-net total-net-tva">
         <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
-        <span>Total +Value: <v-text-field readonly :value="calculateTotalNegValue('plus')"></v-text-field></span>
+        <span>+Value: <v-text-field readonly :value="calculateTotalNegValue('plus')"></v-text-field></span>
       </div>
       <div class="text-left total-net total-net-tva">
         <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
-        <span>Total Dividendes: <v-text-field readonly :value="calculateTotalDivi()"></v-text-field></span>
+        <span>Dividendes: <v-text-field readonly :value="calculateTotalDivi()"></v-text-field></span>
+      </div>
+      <div class="text-left total-net total-net-tva">
+        <!-- Calculate and display the sum of totalNetTVA and totalNetDividendes -->
+        <span>Taxe immobilière: <v-text-field readonly :value="calculateTotalImmo()"></v-text-field></span>
       </div>
 
     </div>
@@ -103,6 +111,7 @@ export default {
       selected: [],
       tableKey: 0,
       isAlternateHeader: false,
+      sharesTransactions: [],
       HistoryTableHeaders: [
         {
           title: 'Valeur',
@@ -125,7 +134,7 @@ export default {
   },
 
   created() {
-
+    this.fetchSharesTransactions();
     this.fetchTransactions()
   },
 
@@ -271,12 +280,12 @@ export default {
 
       this.transactions.forEach(transaction => {
         const { value, quantityBuy, quantitySell } = transaction;
-        diffStocks = quantitySell- quantityBuy;
+        diffStocks = quantitySell - quantityBuy;
       })
-      
-        return diffStocks;
 
-      
+      return diffStocks;
+
+
     },
     calculateTotalNegValue(option) {
       let plusValue = 0;
@@ -305,16 +314,28 @@ export default {
     },
 
     calculateTotalDivi() {
-      let totalDivi= 0;
+      let totalDivi = 0;
       this.transactions.forEach(transaction => {
-        const {diviTrans, type } = transaction;
-      
-        totalDivi += diviTrans;
+        const { diviTrans, type, value } = transaction;
+        if (value !== "Taxe immobilière") {
+          totalDivi += diviTrans;
+        }
 
       })
       return this.formatCurrency(totalDivi);
     },
 
+    calculateTotalImmo() {
+      let total = 0;
+      this.sharesTransactions.forEach(transaction => {
+        const { value, totalcom } = transaction;
+        if (value === "Taxe immobilière") {
+          const amount = parseFloat(transaction.totalcom)
+          total += amount;
+        }
+      })
+      return this.formatCurrency(total);
+    },
 
     onShareSelected() {
       // Call the function when the selected share value changes
@@ -385,64 +406,72 @@ export default {
       this.selectedStock = ''
       this.search = ''
     },
+    async fetchSharesTransactions() {
+      try {
+        const response = await HistoryTransactionsService.reqShares()
+        this.sharesTransactions = response.data
 
+      } catch (error) {
+        console.error(error)
+      }
+    },
 
 
     async fetchTransactions() {
-  try {
-    const response = await HistoryTransactionsService.index();
-    const responseDivi = await HistoryTransactionsService.reqShares();
-    this.transactions = response.data;
-    this.diviTansactions = responseDivi.data;
+      try {
+        const response = await HistoryTransactionsService.index();
+        const responseDivi = await HistoryTransactionsService.reqShares();
+        this.transactions = response.data;
+        this.diviTansactions = responseDivi.data;
 
-    // Calculate the buy and sell totals for each value
-    const nameTotals = {};
+        // Calculate the buy and sell totals for each value
+        const nameTotals = {};
 
-    // Combine transactions and diviTansactions into one array
-    const allTransactions = [...this.transactions, ...this.diviTansactions];
-    allTransactions.forEach(transaction => {
-      const { value, type, quantity, totalcom } = transaction;
+        // Combine transactions and diviTansactions into one array
+        const allTransactions = [...this.transactions, ...this.diviTansactions];
+        allTransactions.forEach(transaction => {
+          const { value, type, quantity, totalcom } = transaction;
 
 
-      const totalcomValue = parseFloat(totalcom);
+          const totalcomValue = parseFloat(totalcom);
 
-      if (!nameTotals[value]) {
-        nameTotals[value] = { value, quantityBuy: 0, quantitySell: 0, quantityDiff: 0, diviTrans: 0, buyTotal: 0, sellTotal: 0, totalcomTotal: 0 };
+          if (!nameTotals[value]) {
+            nameTotals[value] = { value, quantityBuy: 0, quantitySell: 0, quantityDiff: 0, diviTrans: 0, buyTotal: 0, sellTotal: 0, totalcomTotal: 0 };
+          }
+
+          if (type === "Achat") {
+            nameTotals[value].buyTotal += totalcomValue;
+            nameTotals[value].quantityBuy += parseFloat(quantity);
+          } else if (type === "Vente") {
+            nameTotals[value].quantitySell += parseFloat(quantity);
+            nameTotals[value].sellTotal += totalcomValue;
+          } else {
+            nameTotals[value].diviTrans += parseFloat(totalcom);
+
+          }
+
+          nameTotals[value].quantityDiff = Math.abs(nameTotals[value].quantitySell - nameTotals[value].quantityBuy);
+
+          const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
+          if (total > 0) {
+            const totalCom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) * 0.15;
+            nameTotals[value].totalcom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) - totalCom;
+          } else {
+            nameTotals[value].totalcom = total;
+          }
+        });
+
+        // Now, nameTotals array contains the desired totals for each unique value
+        const nameTotalsArray = Object.values(nameTotals);
+
+        // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
+        this.transactions = nameTotalsArray;
+
+
+      } catch (error) {
+        console.error(error);
       }
-      
-      if (type === "Achat") {
-        nameTotals[value].buyTotal += totalcomValue;
-        nameTotals[value].quantityBuy += parseFloat(quantity);
-      } else if (type === "Vente") {
-        nameTotals[value].quantitySell += parseFloat(quantity);
-        nameTotals[value].sellTotal += totalcomValue;
-      }else{
-        nameTotals[value].diviTrans += parseFloat(totalcom);
-        
-      }
-      
-      nameTotals[value].quantityDiff = Math.abs(nameTotals[value].quantitySell - nameTotals[value].quantityBuy);
-
-      const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
-      if (total > 0) {
-        const totalCom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) * 0.15;
-        nameTotals[value].totalcom = (nameTotals[value].sellTotal - nameTotals[value].buyTotal) - totalCom;
-      } else {
-        nameTotals[value].totalcom = total;
-      }
-    });
-
-    // Now, nameTotals array contains the desired totals for each unique value
-    const nameTotalsArray = Object.values(nameTotals);
-
-    // Assign the nameTotalsArray to the v-model or any data property you prefer to use in v-data-table
-    this.transactions = nameTotalsArray;
-
-
-  } catch (error) {
-    console.error(error);
-  }
-}
+    }
 
 
 
