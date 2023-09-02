@@ -163,12 +163,12 @@ export default {
         {
           title: 'Type',
           key: 'type',
-          width: '170px'
+          width: '110px'
         },
         {
           title: 'Quantité',
           key: 'quantity',
-          width: '170px'
+          width: '150px'
 
         },
         {
@@ -191,7 +191,9 @@ export default {
         },
         {
           title: 'Banque',
-          key: 'bank'
+          key: 'bank',
+          width: '155px'
+
         },
         {
           title: 'Diff. banque',
