@@ -1,5 +1,16 @@
 <template>
   <div style="padding: 20px;">
+    <v-row>
+      <v-col>
+        <v-text-field v-model="startDate" type="datetime-local"></v-text-field>
+
+      </v-col>
+      <v-col>
+        <v-text-field v-model="endDate" type="datetime-local"></v-text-field>
+
+      </v-col>
+
+    </v-row>
     <v-row class="d-flex">
       <v-col cols="3">
         <v-select clearable v-model="selectedStock" v-on:change="this.onShareSelected" :items="stockOptions"
@@ -34,8 +45,9 @@
       </v-col>
 
     </v-row>
+ 
     <v-data-table width="400" :key="tableKey" ref="myTable" height="500" fixed-header :headers="dynamicTableHeaders"
-      :items="dynamicFilter" class="text-no-wrap rounded-0 text-sm" return-object v-model="selected"
+      :items="dynamicFilter" class="text-no-wrap mt-5 rounded-0 text-sm" return-object v-model="selected"
       :item-value="(filteredTransactions) => `${filteredTransactions.id}`" hover>
 
       <template v-slot:item.type="{ item }">
@@ -88,10 +100,12 @@
       <div>CUMP Vente: <v-text-field readonly :value="formatCurrency(weightedVente)"></v-text-field></div>
     </div>
     <div class="text-left total-net">
-      <div>Total Actions Achat: <v-text-field readonly :value="totalQuantityAchat.toLocaleString('fr-MA')"> </v-text-field></div>
+      <div>Total Actions Achat: <v-text-field readonly :value="totalQuantityAchat.toLocaleString('fr-MA')">
+        </v-text-field></div>
     </div>
     <div class="text-left total-net">
-      <div>Total Actions Vente: <v-text-field readonly :value="totalQuantityVente.toLocaleString('fr-MA')"></v-text-field></div>
+      <div>Total Actions Vente: <v-text-field readonly :value="totalQuantityVente.toLocaleString('fr-MA')"></v-text-field>
+      </div>
     </div>
     <div class="text-left total-net">
       <div>Total Net Achat: <v-text-field readonly :value="formattedTotalNetAchat"></v-text-field></div>
@@ -138,6 +152,8 @@ import HistoryTransactionsService from '@/services/HistoryTransactionsService'
 
 export default {
   data() {
+    const currentDate = new Date();
+
     return {
       transactions: [],
       sharesTransactions: [],
@@ -147,6 +163,8 @@ export default {
       filterType: 'Tout',
       totalNet: 0,
       selected: [],
+      startDate: currentDate.toISOString().slice(0, 16), // Set startDate to today's date
+      endDate: currentDate.toISOString().slice(0, 16),   // Svert to ISO string 
       tableKey: 0,
       isAlternateHeader: "tout",
       editingColumn: null,
@@ -320,9 +338,9 @@ export default {
     dynamicTableHeaders() {
       if (this.isAlternateHeader === "div") {
         return this.DividendesHeaders;
-      } else if(this.isAlternateHeader === "tout"){
+      } else if (this.isAlternateHeader === "tout") {
         return this.HistoryTableHeaders;
-      }else{
+      } else {
         return this.ImmoHeaders;
       }
     },
@@ -363,10 +381,10 @@ export default {
     },
 
     filteredSharesTransactions() {
-      if (!this.selectedStock && !this.search && this.filterType == 'Dividendes' ) {
+      if (!this.selectedStock && !this.search && this.filterType == 'Dividendes') {
         const filteredTransactions = this.sharesTransactions.filter(transaction => !transaction.value.includes('Taxe immobilière'));
         return filteredTransactions;
-      }else if(!this.selectedStock && !this.search && this.filterType == 'Taxe immobilière'){
+      } else if (!this.selectedStock && !this.search && this.filterType == 'Taxe immobilière') {
         const filteredTransactions = this.sharesTransactions.filter(transaction => transaction.value.includes('Taxe immobilière'));
         return filteredTransactions;
 
@@ -392,12 +410,41 @@ export default {
     },
 
     filteredTransactions() {
-      if (!this.selectedStock && !this.search && !this.filterType) {
-        return this.transactions
+      if (!this.selectedStock && !this.search && !this.filterType && !this.startDate && !this.endDate) {
+        return this.transactions;
       }
 
-
       return this.transactions.filter((transaction) => {
+
+
+
+        
+        function parseDateString(dateString) {
+          if (dateString.includes(',')) {
+            const parts = dateString.split(', ');
+            const dateParts = parts[0].split('/');
+            const timeParts = parts[1].split(':');
+            return new Date(
+              Number(dateParts[2]),
+              Number(dateParts[1]) - 1, 
+              Number(dateParts[0]),
+              Number(timeParts[0]),
+              Number(timeParts[1])
+            );
+          } else {
+            // ISO format like "2023-09-20T12:46"
+            return new Date(dateString);
+          }
+        }
+
+        if (
+          (this.startDate && parseDateString(transaction.date) < parseDateString(this.startDate)) ||
+          (this.endDate && parseDateString(transaction.date) > parseDateString(this.endDate))
+        ) {
+       
+          return false;
+        }
+
         if (
           this.filterType &&
           this.filterType !== 'Tout' &&
@@ -406,36 +453,32 @@ export default {
           !transaction.type.toLowerCase().includes(this.filterType.toLowerCase())
         ) {
           this.isAlternateHeader = "tout";
-
-          return false
+          return false;
         }
-        if (
-          this.selectedStock &&
-          !transaction.value.toLowerCase().includes(this.selectedStock.toLowerCase())
-        ) {
-          return false
+
+        if (this.selectedStock && !transaction.value.toLowerCase().includes(this.selectedStock.toLowerCase())) {
+          return false;
         }
 
         if (this.search && !transaction.value.toLowerCase().includes(this.search.toLowerCase())) {
-          return false
+          return false;
         }
+
         if (this.filterType == 'Dividendes') {
           this.isAlternateHeader = "div";
-
         }
+
         if (this.filterType == 'Taxe immobilière') {
           this.isAlternateHeader = "immo";
-
         }
-        if (
-          this.filterType &&
-          this.filterType == 'Tout') {
+
+        if (this.filterType && this.filterType == 'Tout') {
           this.isAlternateHeader = 'tout';
-
-          return true
+          return true;
         }
-        return true
-      })
+       
+        return true;
+      });
     },
 
 
@@ -575,10 +618,10 @@ export default {
       if (totalColumnIndex === -1) return 0
 
       return this.filteredSharesTransactions.reduce((total, transaction) => {
-        if(transaction.value !=="Taxe immobilière"){
-        
-        const amount = parseFloat(transaction[this.DividendesHeaders[totalColumnIndex].key])
-        return total + amount
+        if (transaction.value !== "Taxe immobilière") {
+
+          const amount = parseFloat(transaction[this.DividendesHeaders[totalColumnIndex].key])
+          return total + amount
         }
         return total;
       }, 0)
@@ -592,7 +635,7 @@ export default {
       if (totalColumnIndex === -1) return 0
 
       return this.filteredSharesTransactions.reduce((total, transaction) => {
-        if(transaction.value==="Taxe immobilière"){
+        if (transaction.value === "Taxe immobilière") {
           const amount = parseFloat(transaction[this.DividendesHeaders[totalColumnIndex].key])
           return total + amount
 
