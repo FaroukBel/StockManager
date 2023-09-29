@@ -361,15 +361,6 @@ export default {
         }
       }
     },
-
-    editItem(item) {
-      // Logic for editing the item
-      // You can access the item's properties using item.propertyName
-      // For example: item.id, item.value, item.quantity, etc.
-      // Implement your custom logic to handle the edit action
-      console.log('Edit item:', item)
-    },
-
     async saveItem(item) {
       this.transaction = item;
       HistoryTransactionsService.updateTransaction(this.transaction)

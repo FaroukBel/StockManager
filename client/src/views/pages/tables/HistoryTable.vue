@@ -45,10 +45,10 @@
       </v-col>
 
     </v-row>
- 
+
     <v-data-table width="400" :key="tableKey" ref="myTable" height="500" fixed-header :headers="dynamicTableHeaders"
       :items="dynamicFilter" class="text-no-wrap mt-5 rounded-0 text-sm" return-object v-model="selected"
-      :item-value="(filteredTransactions) => `${filteredTransactions.id}`" hover>
+      :item-value="(filteredTransactions) => `${filteredTransactions.id}`" hover  :pagination="itemsCount" items-per-page-text=""> 
 
       <template v-slot:item.type="{ item }">
         <div class="d-flex type-columns"
@@ -77,6 +77,7 @@
       <template v-slot:item.quantity="{ item }">
         <v-text-field v-model="item.value.quantity" type="number" class="no-border"></v-text-field>
       </template>
+      
       <template v-slot:item.price="{ item }">
         <v-text-field v-model="item.value.price" type="number" class="no-border"></v-text-field>
       </template>
@@ -163,7 +164,7 @@ export default {
       filterType: 'Tout',
       totalNet: 0,
       selected: [],
-      startDate: currentDate.toISOString().slice(0, 16), // Set startDate to today's date
+      startDate: "",// Set startDate to today's date
       endDate: currentDate.toISOString().slice(0, 16),   // Svert to ISO string 
       tableKey: 0,
       isAlternateHeader: "tout",
@@ -388,8 +389,8 @@ export default {
         const filteredTransactions = this.sharesTransactions.filter(transaction => transaction.value.includes('Taxe immobilière'));
         return filteredTransactions;
 
-      }
-
+       }
+      this.itemsCount()
       return this.sharesTransactions.filter((transaction) => {
 
         if (
@@ -410,7 +411,7 @@ export default {
     },
 
     filteredTransactions() {
-      if (!this.selectedStock && !this.search && !this.filterType && !this.startDate && !this.endDate) {
+      if (!this.selectedStock && !this.search && !this.filterType) {
         return this.transactions;
       }
 
@@ -418,30 +419,32 @@ export default {
 
 
 
-        
-        function parseDateString(dateString) {
-          if (dateString.includes(',')) {
-            const parts = dateString.split(', ');
-            const dateParts = parts[0].split('/');
-            const timeParts = parts[1].split(':');
-            return new Date(
-              Number(dateParts[2]),
-              Number(dateParts[1]) - 1, 
-              Number(dateParts[0]),
-              Number(timeParts[0]),
-              Number(timeParts[1])
-            );
-          } else {
-            // ISO format like "2023-09-20T12:46"
-            return new Date(dateString);
-          }
+        function formatDate(inputDate) {
+          const date = new Date(inputDate);
+
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+          const year = date.getFullYear();
+
+          return `${day}/${month}/${year}`;
         }
 
+ 
+        const startDateFormated = formatDate(this.startDate);
+        const endDateFormated = formatDate(this.endDate);
+
+
+        function compareDates(dateStr1) {
+          const date1Parts = dateStr1.split('/').map(Number);
+
+          const date1 = new Date(date1Parts[2], date1Parts[1] - 1, date1Parts[0]);
+
+          return date1
+        } 
+     
         if (
-          (this.startDate && parseDateString(transaction.date) < parseDateString(this.startDate)) ||
-          (this.endDate && parseDateString(transaction.date) > parseDateString(this.endDate))
+          compareDates(startDateFormated) > compareDates(transaction.date) || compareDates(endDateFormated) < compareDates(transaction.date)
         ) {
-       
           return false;
         }
 
@@ -476,7 +479,7 @@ export default {
           this.isAlternateHeader = 'tout';
           return true;
         }
-       
+
         return true;
       });
     },
@@ -757,7 +760,9 @@ export default {
   },
 
   methods: {
-
+    itemsCount(pagination) {
+    console.log(pagination) // length of filtered/searched items in Vuetify data-table
+  },
     onHeaderClick(header, event) {
       // header contains the column information, including the key (value)
       const columnKey = header.value;

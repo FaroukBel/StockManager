@@ -14,6 +14,7 @@ const getTransactions = async (req, res) => {
 const storeBuyTransaction = async (req, res) => {
   try {
     const { date, stock, type, quantity, buyprice, total, tax, totalcom, bank } = req.body;
+    console.log(date)
     const value = stock;
     const price = buyprice;
     const buyhistorytransaction = await HistoryTransaction.create({
@@ -80,9 +81,9 @@ const deleteTransaction = async (req, res) => {
 const updateTransaction = async (req, res) => {
   try {
     const { transactionId } = req.params;
-    console.log(transactionId)
+
     const { date, stock, type, quantity, price, total, tax, totalcom, bank } = req.body;
-    console.log(date)
+
     const transaction = await HistoryTransaction.findByPk(transactionId);
     if (!transaction) {
       

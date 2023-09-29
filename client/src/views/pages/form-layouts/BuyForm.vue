@@ -118,7 +118,7 @@ import swal from 'sweetalert';
 import HistoryTransactionsService from '@/services/HistoryTransactionsService';
 import { router } from '@/router';
 const currentDate = new Date();
-const formattedDate = currentDate.toLocaleString('en-GB', {
+const formattedDate = currentDate.toLocaleString('fr-Fr', {
   day: '2-digit',
   month: '2-digit',
   year: '2-digit',
@@ -288,6 +288,8 @@ export default {
     swal('Important !','Veuillez remplir les champs obligatoires.', 'info');
     return;
   }
+
+  console.log(this.transaction.date)
   HistoryTransactionsService.postBuy(this.transaction)
         .then(() => {
           this.transaction.quantity='';

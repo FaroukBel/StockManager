@@ -4,13 +4,14 @@ module.exports = (sequalize, DataTypes) =>
             type:DataTypes.DATE,
             get() {
                 const rawValue = this.getDataValue('date');
-                const formattedDate = new Date(rawValue).toLocaleString('en-GB', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                });
+                const date = new Date(rawValue);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                const year = date.getFullYear();
+                
+                const formattedDate = `${day}/${month}/${year}`;
+                
+                console.log(formattedDate);
                 return formattedDate;
               },
         }, value: {
