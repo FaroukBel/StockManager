@@ -48,7 +48,7 @@
 
     <v-data-table width="400" :key="tableKey" ref="myTable" height="500" fixed-header :headers="dynamicTableHeaders"
       :items="dynamicFilter" class="text-no-wrap mt-5 rounded-0 text-sm" return-object v-model="selected"
-      :item-value="(filteredTransactions) => `${filteredTransactions.id}`" hover  :pagination="itemsCount" items-per-page-text=""> 
+      :item-value="(filteredTransactions) => `${filteredTransactions.id}`" hover  :pagination="itemsCount" items-per-page-text="" items-per-page="1000"> 
 
       <template v-slot:item.type="{ item }">
         <div class="d-flex type-columns"
@@ -77,7 +77,7 @@
       <template v-slot:item.quantity="{ item }">
         <v-text-field v-model="item.value.quantity" type="number" class="no-border"></v-text-field>
       </template>
-      
+
       <template v-slot:item.price="{ item }">
         <v-text-field v-model="item.value.price" type="number" class="no-border"></v-text-field>
       </template>
