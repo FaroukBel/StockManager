@@ -15,7 +15,7 @@
           />
         </VCol>
       <VCol cols="12" md="6">
-        <v-text-field v-model="transaction.date" :value="transaction.date" type="datetime-local"></v-text-field>
+        <v-text-field v-model="transaction.date" :value="transaction.date" :max="getCurrentDateTime()" type="datetime-local"></v-text-field>
       </VCol>
 
 
@@ -249,6 +249,7 @@ export default {
       // Format the date to be compatible with datetime-local input
       return `${year}-${month}-${day}T${hours}:${minutes}`;
     },
+    
     handleDataUpdate(data) {
       // Do something with the data received from TransactionForm
       // For example, you can store it in a component's data property

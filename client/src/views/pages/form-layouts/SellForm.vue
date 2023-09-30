@@ -17,7 +17,7 @@
         </VCol>
 
         <VCol cols="12" md="6">
-        <v-text-field  v-model="transaction.date" :value="transaction.date" type="datetime-local"></v-text-field>
+        <v-text-field  v-model="transaction.date" :value="transaction.date"   :max="getCurrentDateTime()" type="datetime-local"></v-text-field>
       </VCol>
 
 
@@ -254,6 +254,19 @@ export default {
  
   },
   methods: {
+     getCurrentDateTime() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = '00';
+  const minutes = '00';
+
+  const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+  return formattedDate;
+}
+,
     getCurrentDateTime() {
       const now = new Date();
       const year = now.getFullYear();
