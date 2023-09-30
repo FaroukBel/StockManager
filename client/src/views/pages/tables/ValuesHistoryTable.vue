@@ -441,7 +441,7 @@ export default {
 
           }
 
-          nameTotals[value].quantityDiff = Math.abs(nameTotals[value].quantitySell - nameTotals[value].quantityBuy);
+          nameTotals[value].quantityDiff = nameTotals[value].quantitySell - nameTotals[value].quantityBuy;
 
           const total = (nameTotals[value].sellTotal - nameTotals[value].buyTotal);
           if (total > 0) {
