@@ -131,6 +131,7 @@ export default {
         "Bmce Bank",
         "Cartier Saada",
         "CDM",
+        "CFG",
         "CIH",
         "Ciments Du Maroc",
         "Colorado",

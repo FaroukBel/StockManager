@@ -114,8 +114,8 @@
 
 
 <script>
-import swal from 'sweetalert';
-import HistoryTransactionsService from '@/services/HistoryTransactionsService';
+import swal from 'sweetalert'
+import HistoryTransactionsService from '@/services/HistoryTransactionsService'
 import { router } from '@/router';
 const currentDate = new Date();
 const formattedDate = currentDate.toLocaleString('fr-Fr', {
@@ -156,6 +156,7 @@ export default {
   "Bmce Bank",
   "Cartier Saada",
   "CDM",
+  "CFG",
   "CIH",
   "Ciments Du Maroc",
   "Colorado",
