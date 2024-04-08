@@ -11,7 +11,7 @@ module.exports = (sequalize, DataTypes) =>
                 
                 const formattedDate = `${day}/${month}/${year}`;
                 
-                console.log(formattedDate);
+                
                 return formattedDate;
               },
         }, value: {

@@ -14,7 +14,7 @@ const getTransactions = async (req, res) => {
 const storeBuyTransaction = async (req, res) => {
   try {
     const { date, stock, type, quantity, buyprice, total, tax, totalcom, bank } = req.body;
-    console.log(date)
+    
     const value = stock;
     const price = buyprice;
     const buyhistorytransaction = await HistoryTransaction.create({

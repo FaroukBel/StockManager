@@ -1,10 +1,9 @@
-
 <template>
   <VForm ref="myForm" @submit.prevent>
     <VRow>
       <!-- 👉 Valeur dropdown -->
       <VCol cols="12" md="6">
-        <VSelect clearable v-model="transaction.stock" :items="valeurOptions" label="Valeur"
+        <VSelect v-model="transaction.stock" clearable :items="valeurOptions" label="Valeur"
           placeholder="Sélectionnez une valeur" :style="{ color: 'rgb(73, 249, 3) !important' }" required />
       </VCol>
 
@@ -16,14 +15,12 @@
 
       <!-- 👉 Buy Price -->
       <VCol cols="12" md="6">
-
         <VTextField v-model="transaction.buyprice" label="Prix d'achat" placeholder=""
           :style="{ color: 'rgb(73, 249, 3) !important' }" type="number" min="0" required />
       </VCol>
 
       <!-- 👉 Sell Price -->
       <VCol cols="12" md="6">
-
         <VTextField v-model="transaction.sellprice" label="Prix de vente" placeholder=""
           :style="{ color: 'rgb(73, 249, 3) !important' }" type="number" min="0" />
       </VCol>
@@ -56,8 +53,6 @@
           :style="{ color: 'rgb(73, 249, 3) !important' }" type="number" />
       </VCol>
       <VCol cols="12" class="d-flex gap-4">
-
-
         <VBtn color="secondary" variant="tonal" @click="clearForm">
           Effacer
         </VBtn>
@@ -70,9 +65,8 @@
 </template>
 
 <script>
+import TransactionService from '@/services/TransactionService'
 import swal from "sweetalert"
-import TransactionService from '@/services/TransactionService';
-import { router } from '@/router';
 
 export default {
   data() {
@@ -86,7 +80,7 @@ export default {
         pl: '',
         tax: '',
         taxtva: '',
-        totalgain: ''
+        totalgain: '',
       },
       valeurOptions: ["AFMA SA",
         "Afric Industries Sa",
@@ -163,87 +157,88 @@ export default {
         "Unimer",
         "Wafa Assurance",
         "Zellidja S.A"], // Static list of dropdown options
-    };
+    }
   },
   watch: {
     'transaction.quantity': {
       handler(newValue) {
-        this.calculateTotal();
+        this.calculateTotal()
       },
-      immediate: true
+      immediate: true,
     },
     'transaction.buyprice': {
       handler(newValue) {
-        this.calculateTotal();
+        this.calculateTotal()
       },
-      immediate: true
+      immediate: true,
     },
     'transaction.sellprice': {
       handler(newValue) {
-        this.calculatePL();
+        this.calculatePL()
       },
-      immediate: true
+      immediate: true,
     },
     'transaction.total': {
       handler(newValue) {
-        this.calculateTotalGain();
-        this.calculatePL();
+        this.calculateTotalGain()
+        this.calculatePL()
 
       },
-      immediate: true
+      immediate: true,
     },
     'transaction.pl': {
       handler(newValue) {
-        this.calculateTotalGain();
+        this.calculateTotalGain()
       },
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   methods: {
     calculateTotal() {
-      const quantity = parseFloat(this.transaction.quantity);
-      const buyPrice = parseFloat(this.transaction.buyprice);
+      const quantity = parseFloat(this.transaction.quantity)
+      const buyPrice = parseFloat(this.transaction.buyprice)
 
       if (!isNaN(quantity) && !isNaN(buyPrice)) {
-        this.transaction.total = (quantity * buyPrice).toFixed(2);
+        this.transaction.total = (quantity * buyPrice).toFixed(2)
       } else {
-        this.transaction.total = '';
+        this.transaction.total = ''
       }
     },
     calculatePL() {
-      const quantity = parseFloat(this.transaction.quantity);
-      const buyPrice = parseFloat(this.transaction.buyprice);
-      const sellPrice = parseFloat(this.transaction.sellprice);
+      const quantity = parseFloat(this.transaction.quantity)
+      const buyPrice = parseFloat(this.transaction.buyprice)
+      const sellPrice = parseFloat(this.transaction.sellprice)
       if (!isNaN(quantity) && !isNaN(buyPrice) && !isNaN(sellPrice)) {
-        const buyEntryTax = quantity * buyPrice * 0.007665;
-        const sellExitTax = quantity * sellPrice * 0.007665;
-        const entryBuyPrice = (quantity * buyPrice) + buyEntryTax;
-        const exitSellPrice = (quantity * sellPrice) - sellExitTax;
-        const tva = (exitSellPrice - entryBuyPrice) * 0.15;
-        this.transaction.tax = parseFloat(parseFloat(buyEntryTax.toFixed(2)) + parseFloat(sellExitTax.toFixed(2)));
+        const buyEntryTax = quantity * buyPrice * 0.0044
+        const sellExitTax = quantity * sellPrice * 0.0044
+        const entryBuyPrice = (quantity * buyPrice) + buyEntryTax
+        const exitSellPrice = (quantity * sellPrice) - sellExitTax
+        const tva = (exitSellPrice - entryBuyPrice) * 0.15
+
+        this.transaction.tax = parseFloat(parseFloat(buyEntryTax.toFixed(2)) + parseFloat(sellExitTax.toFixed(2)))
         if (exitSellPrice < entryBuyPrice) {
-          this.transaction.pl = (exitSellPrice - entryBuyPrice).toFixed(2);
-          this.transaction.taxtva = 0;
+          this.transaction.pl = (exitSellPrice - entryBuyPrice).toFixed(2)
+          this.transaction.taxtva = 0
         }
         else if (exitSellPrice > entryBuyPrice) {
-          this.transaction.taxtva = tva.toFixed(2);
-          this.transaction.pl = ((exitSellPrice - entryBuyPrice) - tva).toFixed(2);
+          this.transaction.taxtva = tva.toFixed(2)
+          this.transaction.pl = ((exitSellPrice - entryBuyPrice) - tva).toFixed(2)
 
         }
       } else {
-        this.transaction.tax = '';
-        this.transaction.taxtva = '';
+        this.transaction.tax = ''
+        this.transaction.taxtva = ''
 
-        this.transaction.pl = '';
+        this.transaction.pl = ''
       }
     },
     calculateTotalGain() {
-      const total = parseFloat(this.transaction.total);
-      const pl = parseFloat(this.transaction.pl);
+      const total = parseFloat(this.transaction.total)
+      const pl = parseFloat(this.transaction.pl)
       if (!isNaN(total) && !isNaN(pl)) {
-        this.transaction.totalgain = (total + pl).toFixed(2);
+        this.transaction.totalgain = (total + pl).toFixed(2)
       } else {
-        this.transaction.totalgain = '';
+        this.transaction.totalgain = ''
       }
     },
 
@@ -254,29 +249,29 @@ export default {
         !this.transaction.buyprice ||
         !this.transaction.sellprice
       ) {
-        swal('Important', 'Veuillez remplir les champs obligatoires.', 'info');
+        swal('Important', 'Veuillez remplir les champs obligatoires.', 'info')
 
-        return;
+        return
       }
       TransactionService.post(this.transaction)
         .then(() => {
           // Reset form fields after successful submission
-          this.transaction.quantity = '';
-          this.transaction.buyprice = '';
-          this.transaction.sellprice = '';
-          this.transaction.totalgain = '';
-          this.transaction.pl = '';
-          this.transaction.totaltva = '';
+          this.transaction.quantity = ''
+          this.transaction.buyprice = ''
+          this.transaction.sellprice = ''
+          this.transaction.totalgain = ''
+          this.transaction.pl = ''
+          this.transaction.totaltva = ''
 
-          this.$emit('TransactionAdded');
+          this.$emit('TransactionAdded')
 
-          swal('Succès !', 'Transaction enregistrée avec succès!', 'success');
+          swal('Succès !', 'Transaction enregistrée avec succès!', 'success')
 
         })
-        .catch((error) => {
-          console.error(error);
-          swal('Erreur', 'Failed to save transaction.', 'error');
-        });
+        .catch(error => {
+          console.error(error)
+          swal('Erreur', 'Failed to save transaction.', 'error')
+        })
     },
     async clearForm() {
 
@@ -289,11 +284,10 @@ export default {
         pl: '',
         tax: '',
         taxtva: '',
-        totalgain: ''
-      };
+        totalgain: '',
+      }
 
     },
   },
-};
+}
 </script>
-
